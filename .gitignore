@@ -70,11 +70,6 @@ reports/
 # ESLint
 .eslintcache
 
-
-
-# CocoaPods
-/ios/Pods/
-
 coverage/
 
 credentials

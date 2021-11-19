@@ -13,7 +13,7 @@ module.exports = {
     // Module resolver
     ['module-resolver', {
         root: ['./src'],
-        extensions: ['.ios.js', '.android.js', '.js', '.ts', '.tsx', '.json'],
+        extensions: ['.android.js', '.js', '.ts', '.tsx', '.json'],
         alias: {
           src: './src',
         },

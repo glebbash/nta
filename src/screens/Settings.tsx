@@ -25,7 +25,6 @@ export const Settings = () => {
   const { theme, toggleTheme } = useThemeSystem();
 
   const platform = Platform.select({
-    ios: t('home.text.platform.ios'),
     android: t('home.text.platform.android'),
     web: t('home.text.platform.web'),
   });

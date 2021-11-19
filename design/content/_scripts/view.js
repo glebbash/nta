@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 /** @typedef {{ path: string, title: string, meta: object }} Item */
 
 /** @type {Item[]} */
