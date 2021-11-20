@@ -1,23 +1,11 @@
-import { FunctionalComponent, h } from 'preact';
-import { Route, Router } from 'preact-router';
+import { Button } from '@mui/material';
+import { h } from 'preact';
 
-import Home from '../routes/home';
-import NotFoundPage from '../routes/notfound';
-import Profile from '../routes/profile';
-import Header from './header';
-
-const App: FunctionalComponent = () => {
+export const App = () => {
   return (
     <div id="preact_root">
-      <Header />
-      <Router>
-        <Route path="/" component={Home} />
-        <Route path="/profile/" component={Profile} user="me" />
-        <Route path="/profile/:user" component={Profile} />
-        <NotFoundPage default />
-      </Router>
+      <p>Hello World</p>
+      <Button variant="contained">Click me</Button>
     </div>
   );
 };
-
-export default App;

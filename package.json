@@ -11,6 +11,9 @@
     "test": "jest ./tests"
   },
   "dependencies": {
+    "@emotion/react": "^11.6.0",
+    "@emotion/styled": "^11.6.0",
+    "@mui/material": "^5.1.1",
     "preact": "^10.5.15",
     "preact-render-to-string": "^5.1.19",
     "preact-router": "^3.2.1"
@@ -66,6 +69,12 @@
     "setupFiles": [
       "<rootDir>/tests/__mocks__/browserMocks.ts",
       "<rootDir>/tests/__mocks__/setupTests.ts"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^react$": "preact/compat",
+      "^react-dom/test-utils$": "preact/test-utils",
+      "^react-dom$": "preact/compat",
+      "^react/jsx-runtime$": "preact/jsx-runtime"
+    }
   }
 }
