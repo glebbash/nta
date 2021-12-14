@@ -27,3 +27,8 @@ export async function loadPageContent(/** @type {string} */ url) {
 
   return 'Page not loaded';
 }
+
+/** @returns {Promise<unknown>} */
+export async function loadScript(/** @type {string} */ url) {
+  return import(url);
+}

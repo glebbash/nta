@@ -1,5 +1,5 @@
-import { loadScripts } from './load-scripts.js';
+import { initScripts } from './init-scripts.js';
 
 export async function setupPage({ src, container }) {
-  loadScripts(container, src);
+  await initScripts(container, src);
 }

@@ -1,30 +1,31 @@
+import { loadScript } from './server.js';
 import { getAbsoluteUrl } from '../utils/get-absolute-url.js';
 
-export async function loadScripts(
+export async function initScripts(
   /** @type {ParentNode} */ container,
   /** @type {string} */ pageUrl,
 ) {
   const scripts = container.querySelectorAll('script');
 
   for (const script of Array.from(scripts)) {
-    await loadScript(script, pageUrl);
+    await initScriptElement(script, pageUrl);
   }
 }
 
-async function loadScript(
+async function initScriptElement(
   /** @type {HTMLScriptElement} */ script,
   /** @type {string} */ pageUrl,
 ) {
   const scriptUrl = getAbsoluteScriptUrl(script, pageUrl);
 
   if (scriptUrl) {
-    return import(scriptUrl);
+    return loadScript(scriptUrl);
   }
 
-  loadInlineScript(script);
+  initInlineScriptElement(script);
 }
 
-function loadInlineScript(/** @type {HTMLScriptElement} */ script) {
+function initInlineScriptElement(/** @type {HTMLScriptElement} */ script) {
   const scriptCopy = document.createElement('script');
   for (const attribute of Array.from(script.attributes)) {
     scriptCopy.setAttribute(attribute.name, attribute.value);
