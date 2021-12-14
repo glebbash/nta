@@ -15,7 +15,7 @@ async function loadScript(
   /** @type {HTMLScriptElement} */ script,
   /** @type {string} */ pageUrl,
 ) {
-  const scriptUrl = `/data/` + getAbsoluteScriptUrl(script, pageUrl);
+  const scriptUrl = getAbsoluteScriptUrl(script, pageUrl);
 
   if (scriptUrl) {
     return import(scriptUrl);
@@ -39,5 +39,5 @@ function getAbsoluteScriptUrl(
 ) {
   const scriptUrl = script.getAttribute('src');
 
-  return scriptUrl ? getAbsoluteUrl(scriptUrl, pageUrl) : undefined;
+  return scriptUrl ? `/data/` + getAbsoluteUrl(scriptUrl, pageUrl) : undefined;
 }
