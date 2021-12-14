@@ -1,4 +1,4 @@
-import { loadPageContent } from '../system/load-page-content.js';
+import { loadPageContent } from '../system/server.js';
 import { getCurrentPageUrl } from '../system/view.js';
 import { getAbsoluteUrl } from '../utils/get-absolute-url.js';
 
