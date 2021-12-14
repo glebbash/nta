@@ -26,8 +26,6 @@ export class DataModule implements OnModuleInit {
   async onModuleInit() {
     const app: Express = this.httpAdapterHost.httpAdapter.getInstance();
 
-    console.log('static');
-
     app.use(this.options.apiRoute, useStatic(this.options.dataPath));
   }
 }
