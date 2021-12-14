@@ -1,4 +1,6 @@
-import { loadPageContent } from '../system/pages.js';
+import { loadPageContent } from '../system/load-page-content.js';
+import { getCurrentPageUrl } from '../system/view.js';
+import { getAbsoluteUrl } from '../utils/get-absolute-url.js';
 
 export class SubPage extends HTMLElement {
   connectedCallback() {
@@ -15,17 +17,21 @@ export class SubPage extends HTMLElement {
     this.load(src);
   }
 
-  async load(/** @type {string} */ src) {
-    if (!src) {
+  async load(/** @type {string} */ url) {
+    if (!url) {
       return;
     }
 
-    const pageContent = await loadPageContent(`/data/${src}`);
+    const pageUrl = getAbsoluteUrl(url, getCurrentPageUrl());
+
+    const pageContent = await loadPageContent(`/data/${pageUrl}`);
 
     this.innerHTML = pageContent;
 
     document.dispatchEvent(
-      new CustomEvent('page-added', { detail: { src, container: this } }),
+      new CustomEvent('page-added', {
+        detail: { src: pageUrl, container: this },
+      }),
     );
   }
 }

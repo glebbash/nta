@@ -1,1 +1,1 @@
-console.log("page 2 loaded");
+console.log('page 2 loaded');

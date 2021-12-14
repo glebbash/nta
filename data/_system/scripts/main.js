@@ -1,6 +1,6 @@
 import './components/sub-page.js';
 import './components/page-link.js';
-import { loadPage } from './system/view.js';
+import { loadPage, getCurrentPageUrl } from './system/view.js';
 import { setupPage } from './system/setup-page.js';
 
 document.addEventListener('page-added', (event) => {
@@ -16,9 +16,7 @@ document.addEventListener('view-set', loadPageFromQuery);
 function loadPageFromQuery() {
   const url = new URL(window.location.href);
 
-  const page = url.searchParams.get('page') ?? '_system/no-page.html';
-
-  console.log('loading', page, 'from query');
+  const page = url.searchParams.get('page') ?? getCurrentPageUrl();
 
   loadPage(page);
 }
