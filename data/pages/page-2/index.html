@@ -1,3 +1,13 @@
+<p>Page 2</p>
+
+<input id="button" type="button" value="Current page" />
+
 <script src="./script.js" type="module"></script>
 
-<p>Page 2</p>
+<script type="module">
+  import { getCurrentPageUrl } from '/data/_system/scripts/system/view.js';
+
+  button.addEventListener('click', () => {
+    alert(`inline ${getCurrentPageUrl()}`);
+  });
+</script>

@@ -15,6 +15,8 @@ document.addEventListener('view-set', (event) => {
 });
 
 export async function loadPage(pageUrl) {
+  console.log('viewing', { pageUrl });
+
   await settings.view?.load(pageUrl);
   settings.pageUrl = getAbsoluteUrl(pageUrl, settings.pageUrl);
 }
