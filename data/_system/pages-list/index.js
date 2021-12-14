@@ -1,23 +1,16 @@
 import 'https://unpkg.com/react@17/umd/react.development.js';
 import 'https://unpkg.com/react-dom@17/umd/react-dom.development.js';
 import 'https://unpkg.com/react-query@3.34.2/dist/react-query.development.js';
-import { request, gql } from 'https://cdn.skypack.dev/graphql-request';
-
 import htm from 'https://unpkg.com/htm?module';
+
+import { listPages } from '../scripts/system/server.js';
+
 const html = htm.bind(React.createElement);
 const { useQuery, QueryClient, QueryClientProvider } = ReactQuery;
 
 /**
  * @typedef {{ src: string, name: string }} PageInfo
  */
-
-const loadPagesQuery = gql`
-  query loadPages($path: String) {
-    pages(path: $path) {
-      id
-    }
-  }
-`;
 
 const queryClient = new QueryClient();
 
@@ -35,9 +28,7 @@ function PagesListPage() {
 }
 
 function PagesList() {
-  const { data, error } = useQuery('pages-list', () =>
-    request('/graphql', loadPagesQuery, { path: 'pages' }),
-  );
+  const { data, error } = useQuery('pages-list', () => listPages('pages'));
 
   if (error) {
     console.error(error);
