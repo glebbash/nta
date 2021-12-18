@@ -58,4 +58,6 @@ function PageItem(/** @type {PageInfo} */ pageInfo) {
   `;
 }
 
-ReactDOM.render(html`<${PagesListPage} />`, root.parentElement);
+export function main(root) {
+  ReactDOM.render(html`<${PagesListPage} />`, root);
+}

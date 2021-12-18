@@ -8,18 +8,25 @@ export async function initScripts(
   const scripts = container.querySelectorAll('script');
 
   for (const script of Array.from(scripts)) {
-    await initScriptElement(script, pageUrl);
+    await initScriptElement(container, script, pageUrl);
   }
 }
 
 async function initScriptElement(
+  /** @type {ParentNode} */ container,
   /** @type {HTMLScriptElement} */ script,
   /** @type {string} */ pageUrl,
 ) {
   const scriptUrl = getAbsoluteScriptUrl(script, pageUrl);
 
   if (scriptUrl) {
-    return loadScript(scriptUrl);
+    const script = await loadScript(scriptUrl);
+
+    if ('main' in script) {
+      await script.main(container);
+    }
+
+    return;
   }
 
   initInlineScriptElement(script);
