@@ -11,12 +11,10 @@ document.addEventListener('page-added', (event) => {
   setupPage({ src, container });
 });
 
-document.addEventListener('view-set', loadPageFromQuery);
-
-function loadPageFromQuery() {
+document.addEventListener('view-set', () => {
   const url = new URL(window.location.href);
 
   const page = url.searchParams.get('page') ?? getCurrentPageUrl();
 
   loadPage(page);
-}
+});
