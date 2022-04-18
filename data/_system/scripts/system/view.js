@@ -1,7 +1,7 @@
 import { getAbsoluteUrl } from '../utils/get-absolute-url.js';
 
-/** @type {{view: import("../components/sub-page").SubPage | null}} */
 const settings = {
+  /** @type {import("../components/sub-page").SubPage | null} */
   view: null,
   pageUrl: '/_system/no-page.html',
 };
