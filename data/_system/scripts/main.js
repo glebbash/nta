@@ -1,5 +1,5 @@
-import './components/sub-page.js';
-import './components/page-link.js';
+import '../components/sub-page.js';
+import '../components/page-link.js';
 import { loadPage, getCurrentPageUrl } from './system/view.js';
 import { setupPage } from './system/setup-page.js';
 

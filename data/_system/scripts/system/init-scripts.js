@@ -47,5 +47,13 @@ function getAbsoluteScriptUrl(
 ) {
   const scriptUrl = script.getAttribute('src');
 
-  return scriptUrl ? `/data/` + getAbsoluteUrl(scriptUrl, pageUrl) : undefined;
+  if (!scriptUrl) {
+    return undefined;
+  }
+
+  if (!scriptUrl.startsWith('/') && !scriptUrl.startsWith('.')) {
+    return scriptUrl;
+  }
+
+  return `/data/` + getAbsoluteUrl(scriptUrl, pageUrl);
 }

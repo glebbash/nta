@@ -1,6 +1,6 @@
-import { loadPageContent } from '../system/server.js';
-import { getCurrentPageUrl } from '../system/view.js';
-import { getAbsoluteUrl } from '../utils/get-absolute-url.js';
+import { loadPageContent } from '../scripts/system/server.js';
+import { getCurrentPageUrl } from '../scripts/system/view.js';
+import { getAbsoluteUrl } from '../scripts/utils/get-absolute-url.js';
 
 export class SubPage extends HTMLElement {
   connectedCallback() {

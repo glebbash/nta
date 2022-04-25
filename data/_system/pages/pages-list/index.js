@@ -3,7 +3,7 @@ import 'https://unpkg.com/react-dom@17/umd/react-dom.development.js';
 import 'https://unpkg.com/react-query@3.34.2/dist/react-query.development.js';
 import htm from 'https://unpkg.com/htm?module';
 
-import { listPages } from '../scripts/system/server.js';
+import { listPages } from '../../scripts/system/server.js';
 
 const html = htm.bind(React.createElement);
 const { useQuery, QueryClient, QueryClientProvider } = ReactQuery;
@@ -11,7 +11,6 @@ const { useQuery, QueryClient, QueryClientProvider } = ReactQuery;
 /**
  * @typedef {{ src: string, name: string }} PageInfo
  */
-
 const queryClient = new QueryClient();
 
 function PagesListPage() {

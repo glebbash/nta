@@ -1,9 +1,9 @@
 import { getAbsoluteUrl } from '../utils/get-absolute-url.js';
 
 const settings = {
-  /** @type {import("../components/sub-page").SubPage | null} */
+  /** @type {import("../../components/sub-page").SubPage | null} */
   view: null,
-  pageUrl: '/_system/no-page.html',
+  pageUrl: '/_system/pages/no-page.html',
 };
 
 document.addEventListener('view-set', (event) => {
