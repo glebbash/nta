@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Page } from './entities/page.entity';
 import { PageInfo } from './types/page-info';
-import { readdir, readFile, stat } from 'fs/promises';
+import { readdir, readFile, stat, writeFile } from 'node:fs/promises';
 
 @Injectable()
 export class PagesService {
@@ -12,6 +12,18 @@ export class PagesService {
   }
 
   async loadPage(id: string): Promise<PageInfo> {
+    return { id };
+  }
+
+  async savePage(id: string, content: string): Promise<PageInfo> {
+    const pagePath = `data/${id}`;
+
+    if ((await stat(pagePath)).isDirectory()) {
+      throw new Error('Cannot save a directory');
+    }
+
+    await writeFile(pagePath, content);
+
     return { id };
   }
 

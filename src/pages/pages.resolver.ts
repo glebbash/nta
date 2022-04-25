@@ -1,4 +1,11 @@
-import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { Page } from './entities/page.entity';
 import { PagesService } from './pages.service';
 import { PageInfo } from './types/page-info';
@@ -24,5 +31,13 @@ export class PagesResolver {
   @ResolveField()
   async content(@Parent() { id }: PageInfo): Promise<Page['content']> {
     return this.service.loadPageContent(id);
+  }
+
+  @Mutation(() => Page)
+  async savePage(
+    @Args('id', { type: () => String }) id: string,
+    @Args('content', { type: () => String }) content: string,
+  ): Promise<PageInfo> {
+    return this.service.savePage(id, content);
   }
 }
