@@ -7,8 +7,10 @@ edition = "2021"
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
+tokio-stream = "0.1"
 warp = "0.3"
 futures = { version = "0.3", default-features = false }
+uuid = { version = "0.4", features = ["serde", "v4"] }
 
 [[bin]]
 name = "server"
