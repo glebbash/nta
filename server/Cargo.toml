@@ -11,6 +11,8 @@ tokio-stream = "0.1"
 warp = "0.3"
 futures = { version = "0.3", default-features = false }
 uuid = { version = "0.4", features = ["serde", "v4"] }
+yrs = "0.12.2"
+yrs-warp = "0.2.0"
 
 [[bin]]
 name = "server"
