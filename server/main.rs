@@ -1,66 +1,74 @@
-use futures::StreamExt;
-use std::{collections::HashMap, sync::Arc};
-use tokio::{sync::mpsc, sync::Mutex, task};
-use tokio_stream::wrappers::UnboundedReceiverStream;
-use warp::{ws::WebSocket, Filter};
+use std::sync::Arc;
+use tokio::select;
+use tokio::sync::RwLock;
+use warp::ws::{WebSocket, Ws};
+use warp::{Filter, Rejection, Reply};
+use yrs::Doc;
+use yrs_warp::awareness::{Awareness, AwarenessRef};
+use yrs_warp::broadcast::BroadcastGroup;
+use yrs_warp::ws::WarpConn;
 
-pub struct Client {
-    pub id: String,
-    pub sender: mpsc::UnboundedSender<warp::ws::Message>,
-}
-
-type Clients = Arc<Mutex<HashMap<String, Client>>>;
+const STATIC_FILES_DIR: &str = "../client";
 
 #[tokio::main]
 async fn main() {
-    let index = warp::get().and(warp::fs::dir("../client"));
-
-    let clients = Arc::new(Mutex::new(HashMap::new()));
-    let ws = warp::path("ws")
-        .and(warp::ws())
-        .and(warp::any().map(move || clients.clone()))
-        .map(|ws: warp::ws::Ws, clients: Clients| {
-            ws.on_upgrade(move |websocket| handle_ws_connection(websocket, clients))
-        });
-
-    let routes = index.or(ws);
-
-    warp::serve(routes).run(([127, 0, 0, 1], 3030)).await;
-}
-
-async fn handle_ws_connection(websocket: WebSocket, clients: Clients) {
-    let (ws_out, mut ws_in) = websocket.split();
-
-    let (sender, receiver) = mpsc::unbounded_channel();
-    let receiver = UnboundedReceiverStream::new(receiver);
-    task::spawn(receiver.map(Ok).forward(ws_out));
-
-    let client = Client {
-        id: uuid::Uuid::new_v4().simple().to_string(),
-        sender,
+    // We're using a single static document shared among all the peers.
+    let awareness: AwarenessRef = {
+        let doc = Doc::new();
+        {
+            // pre-initialize code mirror document with some text
+            let mut txn = doc.transact();
+            let txt = txn.get_text("codemirror");
+            txt.push(
+                &mut txn,
+                r#"function hello() {
+  console.log('hello world');
+}"#,
+            );
+        }
+        Arc::new(RwLock::new(Awareness::new(doc)))
     };
 
-    println!("Client {} connected", &client.id);
+    // open a broadcast group that listens to awareness and document updates
+    // and has a pending message buffer of up to 32 updates
+    let bcast = Arc::new(BroadcastGroup::open(awareness.clone(), 32).await);
 
-    while let Some(result) = ws_in.next().await {
-        match result {
-            Ok(msg) => handle_message(&client, &clients, msg).unwrap(),
-            Err(error) => {
-                eprintln!(
-                    "error processing ws message from {}: {:?}",
-                    client.id, error
-                );
-                break;
-            }
-        };
-    }
+    let static_files = warp::get().and(warp::fs::dir(STATIC_FILES_DIR));
+
+    let ws = warp::path("my-room")
+        .and(warp::ws())
+        .and(warp::any().map(move || awareness.clone()))
+        .and(warp::any().map(move || bcast.clone()))
+        .and_then(ws_handler);
+
+    let routes = ws.or(static_files);
+
+    warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
 }
 
-fn handle_message(
-    sender: &Client,
-    _clients: &Clients,
-    message: warp::ws::Message,
-) -> Result<(), mpsc::error::SendError<warp::ws::Message>> {
-    println!("Received a message from {}: {:?}", sender.id, message);
-    sender.sender.send(message)
+async fn ws_handler(
+    ws: Ws,
+    awareness: AwarenessRef,
+    bcast: Arc<BroadcastGroup>,
+) -> Result<impl Reply, Rejection> {
+    Ok(ws.on_upgrade(move |socket| peer(socket, awareness, bcast)))
+}
+
+async fn peer(ws: WebSocket, awareness: AwarenessRef, bcast: Arc<BroadcastGroup>) {
+    let conn = WarpConn::new(awareness, ws);
+    let sub = bcast.join(conn.inbox().clone());
+    select! {
+        res = sub => {
+            match res {
+                Ok(_) => println!("broadcasting for channel finished successfully"),
+                Err(e) => eprintln!("broadcasting for channel finished abruptly: {}", e),
+            }
+        }
+        res = conn => {
+            match res {
+                Ok(_) => println!("peer disconnected"),
+                Err(e) => eprintln!("peer error occurred: {}", e),
+            }
+        }
+    }
 }
