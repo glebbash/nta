@@ -1,7 +1,8 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "deno.enable": true,
+  "editor.defaultFormatter": "denoland.vscode-deno",
   "[rust]": {
-    "editor.defaultFormatter": "matklad.rust-analyzer"
+    "editor.defaultFormatter": "rust-lang.rust-analyzer"
   },
   "[javascript]": {
     "editor.tabSize": 2
