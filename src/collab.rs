@@ -2,16 +2,13 @@ use std::sync::Arc;
 use tokio::select;
 use tokio::sync::RwLock;
 use warp::ws::{WebSocket, Ws};
-use warp::{Filter, Rejection, Reply};
+use warp::{Rejection, Reply};
 use yrs::Doc;
 use yrs_warp::awareness::{Awareness, AwarenessRef};
 use yrs_warp::broadcast::BroadcastGroup;
 use yrs_warp::ws::WarpConn;
 
-const STATIC_FILES_DIR: &str = "../client";
-
-#[tokio::main]
-async fn main() {
+pub async fn setup_yrs() -> (AwarenessRef, Arc<BroadcastGroup>) {
     // We're using a single static document shared among all the peers.
     let awareness: AwarenessRef = {
         let doc = Doc::new();
@@ -22,7 +19,7 @@ async fn main() {
             txt.push(
                 &mut txn,
                 r#"function hello() {
-  console.log('hello world');
+console.log('hello world');
 }"#,
             );
         }
@@ -33,20 +30,10 @@ async fn main() {
     // and has a pending message buffer of up to 32 updates
     let bcast = Arc::new(BroadcastGroup::open(awareness.clone(), 32).await);
 
-    let static_files = warp::get().and(warp::fs::dir(STATIC_FILES_DIR));
-
-    let ws = warp::path("my-room")
-        .and(warp::ws())
-        .and(warp::any().map(move || awareness.clone()))
-        .and(warp::any().map(move || bcast.clone()))
-        .and_then(ws_handler);
-
-    let routes = ws.or(static_files);
-
-    warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
+    (awareness, bcast)
 }
 
-async fn ws_handler(
+pub async fn ws_handler(
     ws: Ws,
     awareness: AwarenessRef,
     bcast: Arc<BroadcastGroup>,
