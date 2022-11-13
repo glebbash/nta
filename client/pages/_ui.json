@@ -1,12 +1,8 @@
 {
-  "type": "Row",
+  "type": "Box",
+  "align": "horizontal",
   "content": [
-    {
-      "type": "Row",
-      "content": [
-        { "type": "Query" },
-        { "type": "CurrentPage" }
-      ]
-    }
+    { "type": "Query", "setCurrent": true },
+    { "type": "CurrentPage" }
   ]
 }
