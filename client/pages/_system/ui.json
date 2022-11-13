@@ -1,7 +1,0 @@
-{
-  "type": "Row",
-  "content": [
-    { "type": "Query" },
-    { "type": "Page", "url": "/pages/page1.json" }
-  ]
-}
