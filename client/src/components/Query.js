@@ -4,7 +4,7 @@ import { createComponent } from "../utils/create-component.js";
 import { execQuery } from "../utils/api.js";
 import { currentPage } from "./CurrentPage.js";
 
-export const Query = ({ data: { view } }) => {
+export const Query = ({ data: { view, setCurrent } }) => {
   view = view ?? "list";
   if (view !== "list") {
     return createComponent({
@@ -21,13 +21,19 @@ export const Query = ({ data: { view } }) => {
   const pages = data;
 
   const pathItems = pages.map((page) => {
-    const onClick = () => {
-      currentPage.value = page.path;
-    };
+    const onClick = setCurrent
+      ? () => {
+        currentPage.value = page.path;
+      }
+      : null;
+
+    const pageTitle = (setCurrent && page.path === currentPage.value)
+      ? html`<b>${page.title}</b>`
+      : page.title;
 
     return html`
       <li key=${page.path} onClick=${onClick}>
-        ${page.title}
+        ${pageTitle}
       </li>
     `;
   });

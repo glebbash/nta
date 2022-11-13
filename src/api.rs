@@ -26,7 +26,7 @@ pub fn route() -> BoxedFilter<(impl Reply,)> {
                         .ok_or("does not have a title")?;
 
                     Ok(PageInfo {
-                        path: format!("pages/{path}"),
+                        path: format!("/pages/{path}"),
                         title: String::from(title),
                     })
                 })
