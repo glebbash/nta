@@ -4,8 +4,7 @@ import { loadPage } from "../utils/api.js";
 import { createComponent } from "../utils/create-component.js";
 
 export const Page = ({ data: { url } }) => {
-  const { data, error } = useQuery(`/page/${url}`, () => loadPage(url));
-
+  const { data, error } = useQuery(`page/${url}`, () => loadPage(url));
   if (error) return html`<div>failed to load</div>`;
   if (!data) return html`<div>loading...</div>`;
 

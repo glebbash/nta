@@ -1,0 +1,12 @@
+{
+  "type": "Row",
+  "content": [
+    {
+      "type": "Row",
+      "content": [
+        { "type": "Query" },
+        { "type": "CurrentPage" }
+      ]
+    }
+  ]
+}
