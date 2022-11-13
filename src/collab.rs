@@ -1,12 +1,24 @@
 use std::sync::Arc;
 use tokio::select;
 use tokio::sync::RwLock;
+use warp::filters::BoxedFilter;
 use warp::ws::{WebSocket, Ws};
-use warp::{Rejection, Reply};
+use warp::{Filter, Rejection, Reply};
 use yrs::Doc;
 use yrs_warp::awareness::{Awareness, AwarenessRef};
 use yrs_warp::broadcast::BroadcastGroup;
 use yrs_warp::ws::WarpConn;
+
+pub async fn route() -> BoxedFilter<(impl Reply,)> {
+    let (awareness, bcast) = setup_yrs().await;
+
+    warp::path("collab")
+        .and(warp::ws())
+        .and(warp::any().map(move || awareness.clone()))
+        .and(warp::any().map(move || bcast.clone()))
+        .and_then(ws_handler)
+        .boxed()
+}
 
 pub async fn setup_yrs() -> (AwarenessRef, Arc<BroadcastGroup>) {
     // We're using a single static document shared among all the peers.
