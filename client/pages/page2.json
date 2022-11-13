@@ -1,0 +1,7 @@
+{
+  "type": "Page",
+  "title": "Page 2",
+  "content": [
+    { "type": "Text", "value": "Hello World!" }
+  ]
+}
