@@ -4,7 +4,17 @@ import { createComponent } from "../utils/create-component.js";
 import { execQuery } from "../utils/api.js";
 import { currentPage } from "./CurrentPage.js";
 
-export const Query = ({ data: { view, setCurrent } }) => {
+import {
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "https://esm.sh/@mui/material@5.10.13";
+
+import { FiberManualRecord } from "https://esm.sh/@mui/icons-material@5.10.9";
+
+export const Query = ({ data: { view, selectable, onItemClick } }) => {
   view = view ?? "list";
   if (view !== "list") {
     return createComponent({
@@ -21,26 +31,30 @@ export const Query = ({ data: { view, setCurrent } }) => {
   const pages = data;
 
   const pathItems = pages.map((page) => {
-    const onClick = setCurrent
-      ? () => {
+    const onClick = () => {
+      if (selectable) {
         currentPage.value = page.path;
       }
-      : null;
+      onItemClick?.();
+    };
 
-    const pageTitle = (setCurrent && page.path === currentPage.value)
-      ? html`<b>${page.title}</b>`
-      : page.title;
+    const selected = selectable && page.path === currentPage.value;
 
     return html`
-      <li key=${page.path} onClick=${onClick}>
-        ${pageTitle}
-      </li>
+      <${ListItem} key=${page.path}  disablePadding>
+        <${ListItemButton} selected=${selected} onClick=${onClick}>
+          <${ListItemIcon}>
+            <${FiberManualRecord} />
+          <//>
+          <${ListItemText} primary=${page.title} />
+        <//>
+      <//>
     `;
   });
 
   return html`
-    <ul>
+    <${List}>
       ${pathItems}
-    </ul>
+    <//>
   `;
 };

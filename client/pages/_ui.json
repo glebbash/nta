@@ -1,8 +1,0 @@
-{
-  "type": "Box",
-  "align": "horizontal",
-  "content": [
-    { "type": "Query", "setCurrent": true },
-    { "type": "CurrentPage" }
-  ]
-}
