@@ -1,8 +1,7 @@
 import { html } from "../deps.js";
 import { useQuery } from "../utils/use-query.js";
-import { createComponent } from "../utils/create-component.js";
+import { createComponent, currentPage } from "../utils/nta-core.js";
 import { execQuery } from "../utils/api.js";
-import { currentPage } from "./CurrentPage.js";
 
 import {
   List,
