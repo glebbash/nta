@@ -1,5 +1,4 @@
 export { Error } from "./Error.js";
-export { Load } from "./Load.js";
 
 export { Box } from "./Box.js";
 export { Text } from "./Text.js";

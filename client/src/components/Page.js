@@ -4,6 +4,9 @@ import { loadPage } from "../utils/api.js";
 import { currentPage } from "./CurrentPage.js";
 import { createComponent } from "../utils/create-component.js";
 
+import { Typography } from "https://esm.sh/@mui/material@5.10.13";
+import { AcUnit } from "https://esm.sh/@mui/icons-material@5.10.9";
+
 export const Page = ({ data: { url } }) => {
   const { data, error } = useQuery(`page/${url}`, () => loadPage(url));
 
@@ -20,7 +23,8 @@ export const Page = ({ data: { url } }) => {
 
   return html`
     <div style=${{ padding: "4px" }}>
-      <p><b>${title}</b></p>
+      <${AcUnit} color="primary" sx=${{ width: 64, height: 64 }} />
+      <${Typography} variant="h2">${title}<//>
       ${content.map(createComponent)}
     </div>
   `;
