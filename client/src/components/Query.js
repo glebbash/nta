@@ -1,7 +1,7 @@
 import { html } from "../deps.js";
 import { useQuery } from "../utils/use-query.js";
-import { createComponent, currentPage } from "../utils/nta-core.js";
-import { execQuery } from "../utils/api.js";
+import { createComponent, currentPageId } from "../utils/nta-core.js";
+import { listPages } from "../utils/api.js";
 
 import {
   List,
@@ -22,25 +22,25 @@ export const Query = ({ data: { view, selectable, onItemClick } }) => {
     });
   }
 
-  const { data, error } = useQuery(`query`, () => execQuery());
+  const { data, error } = useQuery(`query`, () => listPages());
   if (error) return html`<div>failed to load</div>`;
   if (!data) return html`<div>loading...</div>`;
 
   /** @type {{path: string, title: string}[]} */
   const pages = data;
 
-  const pathItems = pages.map((page) => {
+  const pageItems = pages.map((page) => {
     const onClick = () => {
       if (selectable) {
-        currentPage.value = page.path;
+        currentPageId.value = page.id;
       }
       onItemClick?.();
     };
 
-    const selected = selectable && page.path === currentPage.value;
+    const selected = selectable && page.id === currentPageId.value;
 
     return html`
-      <${ListItem} key=${page.path}  disablePadding>
+      <${ListItem} key=${page.id}  disablePadding>
         <${ListItemButton} selected=${selected} onClick=${onClick}>
           <${ListItemIcon}>
             <${FiberManualRecord} />
@@ -51,9 +51,5 @@ export const Query = ({ data: { view, selectable, onItemClick } }) => {
     `;
   });
 
-  return html`
-    <${List}>
-      ${pathItems}
-    <//>
-  `;
+  return html`<${List}>${pageItems}<//>`;
 };

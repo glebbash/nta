@@ -1,9 +1,30 @@
-export async function loadPage(path) {
-  const res = await fetch(path);
+export async function loadPage(id) {
+  const res = await fetch(`pages/${id}`);
+
+  await handleRequestErrors(res);
+
   return await res.json();
 }
 
-export async function execQuery() {
-  const res = await fetch("api/query");
+export async function savePage(id, data) {
+  const res = await fetch(`pages/${id}`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+  await handleRequestErrors(res);
+}
+
+export async function listPages() {
+  const res = await fetch("pages");
+
+  await handleRequestErrors(res);
+
   return await res.json();
+}
+
+async function handleRequestErrors(res) {
+  if (!res.ok) {
+    throw new Error("Request error " + res.status + ": " + await res.text());
+  }
 }

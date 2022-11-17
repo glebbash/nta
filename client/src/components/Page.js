@@ -1,17 +1,22 @@
 import { html, React } from "../deps.js";
 import { useQuery } from "../utils/use-query.js";
 import { loadPage } from "../utils/api.js";
-import { createComponent, currentPage } from "../utils/nta-core.js";
+import {
+  createComponent,
+  currentPageData,
+  currentPageId,
+} from "../utils/nta-core.js";
 
 import { Typography } from "https://esm.sh/@mui/material@5.10.13";
 import { AcUnit } from "https://esm.sh/@mui/icons-material@5.10.9";
 
-export const Page = ({ data: { url } }) => {
-  const { data, error } = useQuery(`page/${url}`, () => loadPage(url));
+export const Page = ({ data: { id } }) => {
+  const { data, error } = useQuery(`page/${id}`, () => loadPage(id));
 
   React.useEffect(() => {
-    if (data && currentPage.peek() === url) {
+    if (data && currentPageId.peek() === id) {
       document.title = data.title;
+      currentPageData.value = data;
     }
   });
 

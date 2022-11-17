@@ -2,6 +2,6 @@
   "type": "Page",
   "title": "Page 1",
   "content": [
-    { "type": "Text", "value": "Hello World!" }
+    { "type": "Text", "value": "Hello world" }
   ]
 }
