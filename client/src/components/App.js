@@ -12,7 +12,6 @@ import { Page, Query } from "./_mod.js";
 import {
   AppBar,
   Box,
-  CircularProgress,
   CssBaseline,
   Drawer,
   Fab,
@@ -109,7 +108,7 @@ function EditSaveButton() {
       `;
     case PageState.Saving:
       return html`
-        <${IconButton} color="inherit" onClick=${onClick}><${CircularProgress} /><//>
+        <${IconButton} color="inherit" onClick=${onClick} disabled><${Save} /><//>
       `;
   }
 }
