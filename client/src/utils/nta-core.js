@@ -2,7 +2,8 @@ import { React, signal } from "../deps.js";
 import * as components from "../components/_mod.js";
 
 // TODO: add better start page
-export const currentPage = signal("/pages/page1.json");
+export const currentPageId = signal("page1");
+export const currentPageData = signal("page1");
 export const editable = signal(false);
 
 export function useDataState(data, key) {

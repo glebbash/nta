@@ -1,11 +1,18 @@
 import { html, React } from "../deps.js";
-import { editable as editable, useSetSignal } from "../utils/nta-core.js";
+import { savePage } from "../utils/api.js";
+import {
+  currentPageData,
+  currentPageId,
+  editable as editable,
+  useSetSignal,
+} from "../utils/nta-core.js";
 
-import { CurrentPage, Query } from "./_mod.js";
+import { Page, Query } from "./_mod.js";
 
 import {
   AppBar,
   Box,
+  CircularProgress,
   CssBaseline,
   Drawer,
   Fab,
@@ -42,7 +49,7 @@ export function App() {
     <${React.Fragment}>
       <${CssBaseline} />
       <${Box} sx=${{ pb: "50px" }}>
-        <${CurrentPage} />
+        <${Page} data=${{ id: currentPageId.value }} />
       <//>
       ${drawer}
       <${AppBar} position="fixed" color="primary" sx=${AppBarSX}>
@@ -54,25 +61,57 @@ export function App() {
             <${Add} />
           <//>
           <${Box} sx=${{ flexGrow: 1 }} />
-          <${EditButton} />
+          <${EditSaveButton} />
         <//>
       <//>
     <//>
   `;
 }
 
-function EditButton() {
-  const setEditable = useSetSignal(editable);
+const PageState = {
+  Idle: "idle",
+  Editing: "editing",
+  Saving: "saving",
+};
 
-  const toggleEdit = () => {
-    setEditable(!editable.value);
+function EditSaveButton() {
+  const [pageState, setPageState] = React.useState(PageState.Idle);
+  const setPageEditable = useSetSignal(editable);
+
+  const onClick = () => {
+    switch (pageState) {
+      case PageState.Idle:
+        setPageEditable(true);
+        setPageState(PageState.Editing);
+        // TODO: start collaborative session?
+        break;
+      case PageState.Editing:
+        setPageEditable(false);
+        setPageState(PageState.Saving);
+        savePage(currentPageId.peek(), currentPageData.peek()).then(() => {
+          setPageState(PageState.Idle);
+        });
+        break;
+      case PageState.Saving:
+        // do nothing
+        break;
+    }
   };
 
-  return html`
-    <${IconButton} color="inherit" onClick=${toggleEdit}>
-      <${editable.value ? Save : Edit} />
-    <//>
-  `;
+  switch (pageState) {
+    case PageState.Idle:
+      return html`
+        <${IconButton} color="inherit" onClick=${onClick}><${Edit} /><//>
+      `;
+    case PageState.Editing:
+      return html`
+        <${IconButton} color="inherit" onClick=${onClick}><${Save} /><//>
+      `;
+    case PageState.Saving:
+      return html`
+        <${IconButton} color="inherit" onClick=${onClick}><${CircularProgress} /><//>
+      `;
+  }
 }
 
 function useDrawer() {
