@@ -9,7 +9,7 @@ export async function loadPage(id) {
 export async function savePage(id, data) {
   const res = await fetch(`pages/${id}`, {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify(data, null, 2),
   });
 
   await handleRequestErrors(res);

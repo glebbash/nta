@@ -10,6 +10,11 @@ export function useQuery(key, fetcher) {
 
   React.useEffect(() => {
     fetcher().then(setData).catch(setError);
+
+    return () => {
+      setData(undefined);
+      setError(undefined);
+    };
   }, [key]);
 
   return { data, error };
