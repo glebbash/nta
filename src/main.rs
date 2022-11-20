@@ -10,6 +10,7 @@ async fn main() {
     let static_files_route = warp::get().and(warp::fs::dir(STATIC_FILES_DIR));
 
     let routes = api::route()
+        .with(warp::cors())
         .or(collab::route().await)
         .or(static_files_route);
 

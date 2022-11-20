@@ -1,12 +1,12 @@
-import { React } from "../deps.js";
+import { React } from "../deps";
 
 /**
  * @param {string} key
  * @param {() => Promise<unknown>} fetcher
  */
-export function useQuery(key, fetcher) {
-  const [data, setData] = React.useState();
-  const [error, setError] = React.useState();
+export function useRefresh(key, fetcher) {
+  const [data, setData] = useState();
+  const [error, setError] = useState();
 
   React.useEffect(() => {
     fetcher().then(setData).catch(setError);
