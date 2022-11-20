@@ -1,7 +1,22 @@
 {
   "type": "Page",
   "title": "Page 2",
-  "content": [
-    { "type": "Text", "value": "Page 2 text" }
-  ]
+  "content": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "paragraph",
+        "attrs": {
+          "dir": null,
+          "ignoreBidiAutoUpdate": null
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "hello from page 2"
+          }
+        ]
+      }
+    ]
+  }
 }
