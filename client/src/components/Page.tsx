@@ -1,6 +1,5 @@
-import { WysiwygEditor } from "@remirror/react-editors/wysiwyg";
-import { AcUnit } from "@mui/icons-material";
-import { OnChangeJSON } from "@remirror/react";
+import { AcUnit } from "@mui";
+import { WysiwygEditor, OnChangeJSON } from "@remirror";
 
 import { useLoadPage } from "../utils/use-load-page";
 import { Header } from "./Header";

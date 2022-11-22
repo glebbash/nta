@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Add, Edit, Menu, Save } from "@mui/icons-material";
+import { Fragment, useState, useEffect } from "react";
 import {
+  Add,
+  Edit,
+  Menu,
+  Save,
   AppBar,
   Box,
   CssBaseline,
@@ -9,7 +12,7 @@ import {
   IconButton,
   styled,
   Toolbar,
-} from "@mui/material";
+} from "@mui";
 
 import { savePage } from "./utils/api";
 import { useLoadPage } from "./utils/use-load-page";
@@ -83,7 +86,7 @@ export function App() {
   );
 
   return (
-    <React.Fragment>
+    <Fragment>
       <CssBaseline />
       <Box sx={{ pb: "50px" }}> {pageComponent} </Box>
       <AppDrawer
@@ -109,7 +112,7 @@ export function App() {
           <EditSaveButton pageState={pageState} setPageState={setPageState} />
         </Toolbar>
       </StyledAppBar>
-    </React.Fragment>
+    </Fragment>
   );
 }
 
@@ -140,7 +143,6 @@ const StyledDrawer = styled(Drawer)({
 function AppDrawer({ selectedId, open, setOpen, onPageSelect }) {
   return (
     <StyledDrawer
-      container={window?.document?.body}
       variant="temporary"
       open={open}
       onClose={() => setOpen(false)}

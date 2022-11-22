@@ -1,6 +1,6 @@
 use warp::Filter;
 
-const STATIC_FILES_DIR: &str = "./client";
+const STATIC_FILES_DIR: &str = "./client/dist";
 
 mod api;
 mod collab;
