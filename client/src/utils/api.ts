@@ -1,5 +1,4 @@
-// const BASE_URL = "https://8000-glebbash-nta-0g1c0b4nhux.ws-eu74.gitpod.io/";
-const BASE_URL = "/";
+const BASE_URL = import.meta.env.BASE_URL;
 
 export async function loadPage(id: string) {
   const res = await fetch(BASE_URL + `pages/${id}`);
