@@ -1,6 +1,6 @@
 import { useDataState } from "../utils/nta-core";
 
-import { TextField, Typography } from "@mui/material";
+import { TextField, Typography } from "@mui";
 
 // @ts-ignore next
 export const Header = ({ data, state }) => {
