@@ -12,4 +12,4 @@ export type Page = {
   content: string;
 };
 
-export type PageInfo = Pick<Page, "id" | "name">;
+export type PageInfo = Pick<Page, 'id' | 'name'>;

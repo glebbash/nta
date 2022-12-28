@@ -1,6 +1,6 @@
-import { useQuery } from "react-query";
-import { Page, PageId } from "../models/pages";
-import { loadPage } from "../utils/files";
+import { useQuery } from 'react-query';
+import { Page, PageId } from '../models/pages';
+import { loadPage } from '../utils/files';
 
 export type PageEditorProps = {
   pageId: PageId;
@@ -13,7 +13,7 @@ export const pageQueryFor = (pageId: string) => {
 
 export const PageView = ({ pageId }: PageEditorProps) => {
   const { data: response, error } = useQuery(pageQueryFor(pageId), () =>
-    loadPage(pageId)
+    loadPage(pageId),
   );
 
   if (error) {
@@ -33,7 +33,7 @@ export const PageView = ({ pageId }: PageEditorProps) => {
 
   return (
     <div>
-      <p>Path: {"Root" + page.path.join("/") + "/" + page.name}</p>
+      <p>Path: {'Root' + page.path.join('/') + '/' + page.name}</p>
       <p>Meta: {JSON.stringify(page.meta)}</p>
       <p>Content: {page.content}</p>
     </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 export enum RefreshIndex {}
 
@@ -9,6 +9,6 @@ export const useRefresh = () => {
     () => {
       setIndex((index) => index + 1);
     },
-    { index: index as unknown as RefreshIndex }
+    { index: index as unknown as RefreshIndex },
   );
 };

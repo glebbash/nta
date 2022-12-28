@@ -1,20 +1,20 @@
-import { useQuery } from "react-query";
-import { PageId, PageInfo } from "../models/pages";
-import { listPages, ROOT_PATH } from "../utils/files";
+import { useQuery } from 'react-query';
+import { PageId, PageInfo } from '../models/pages';
+import { listPages, ROOT_PATH } from '../utils/files';
 
 export type PageListProps = {
   selectedPageId: PageId | undefined;
   onPageSelect: (pageInfo: PageInfo) => void;
 };
 
-export const PageListQuery = "page-list";
+export const PageListQuery = 'page-list';
 
 export const PageList: React.FC<PageListProps> = ({
   selectedPageId,
   onPageSelect,
 }) => {
   const { data: response, error } = useQuery(PageListQuery, () =>
-    listPages(ROOT_PATH)
+    listPages(ROOT_PATH),
   );
 
   if (error) {
