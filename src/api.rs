@@ -45,7 +45,6 @@ pub fn load_file() -> BoxedFilter<(impl Reply,)> {
             Ok(path["/api/fs/".len()..].to_string())
         })
         .map(|path| {
-            println!("load {}", path);
             let data = fs::read_to_string(path).unwrap();
             Response::builder().body(data)
         })
