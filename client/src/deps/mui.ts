@@ -19,8 +19,10 @@ export { default as Toolbar } from "@mui/material/Toolbar";
 
 // icons
 export { default as Add } from "@mui/icons-material/Add";
+export { default as Search } from "@mui/icons-material/Search";
 export { default as Edit } from "@mui/icons-material/Edit";
 export { default as Menu } from "@mui/icons-material/Menu";
+export { default as MoreVert } from "@mui/icons-material/MoreVert";
 export { default as Save } from "@mui/icons-material/Save";
 export { default as AcUnit } from "@mui/icons-material/AcUnit";
 export { default as FiberManualRecord } from "@mui/icons-material/FiberManualRecord";

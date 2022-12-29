@@ -1,5 +1,5 @@
 import { useQuery } from "../utils/use-query";
-import { listPages } from "../utils/api";
+import { listFiles } from "../utils/api";
 
 import {
   List,
@@ -13,12 +13,12 @@ import {
 type Page = { id: string; title: string };
 
 // @ts-ignore next
-export const Query = ({ data: { view, selectedId, onItemClick } }) => {
+export const Query = ({ view, selectedId, onItemClick }) => {
   if (view && view !== "list") {
     throw new Error("Only list view is supported");
   }
 
-  const { data, error } = useQuery(`query`, () => listPages());
+  const { data, error } = useQuery(`query`, () => listFiles());
   if (error) return <div>failed to load</div>;
   if (!data) return <div>loading...</div>;
 
