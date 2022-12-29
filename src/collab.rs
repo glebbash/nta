@@ -12,7 +12,7 @@ use yrs_warp::ws::WarpConn;
 pub async fn route() -> BoxedFilter<(impl Reply,)> {
     let (awareness, bcast) = setup_yrs().await;
 
-    warp::path("collab")
+    warp::path!("api" / "collab")
         .and(warp::ws())
         .and(warp::any().map(move || awareness.clone()))
         .and(warp::any().map(move || bcast.clone()))
