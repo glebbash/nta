@@ -16,6 +16,8 @@ export async function saveFile(path: string, data: string) {
   );
 }
 
-export async function listFiles(path: string) {
-  return handleErrors(fetch(FS_URL + path)).then((r) => r.json());
+export type File = { name: string };
+
+export async function listFiles(path: string): Promise<File[]> {
+  return handleErrors(fetch(FS_URL + path + "/")).then((r) => r.json());
 }

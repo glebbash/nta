@@ -1,5 +1,5 @@
 import { useQuery } from "../utils/use-query";
-import { listFiles } from "../utils/api";
+import { listPages } from "../utils/api";
 
 import {
   List,
@@ -10,21 +10,19 @@ import {
   FiberManualRecord,
 } from "@mui";
 
-type Page = { id: string; title: string };
-
 // @ts-ignore next
 export const Query = ({ view, selectedId, onItemClick }) => {
   if (view && view !== "list") {
     throw new Error("Only list view is supported");
   }
 
-  const { data, error } = useQuery(`query`, () => listFiles());
+  const { data, error } = useQuery(`query`, () => listPages());
   if (error) return <div>failed to load</div>;
   if (!data) return <div>loading...</div>;
 
   return (
     <List>
-      {(data as Page[]).map((page) => (
+      {data.map((page) => (
         <ListItem key={page.id} disablePadding>
           <ListItemButton
             selected={selectedId === page.id}
@@ -32,7 +30,9 @@ export const Query = ({ view, selectedId, onItemClick }) => {
           >
             <ListItemIcon>
               <FiberManualRecord />
-              <ListItemText primary={page.title} />
+              <ListItemText
+                primary={(page.meta.title as string) ?? `<${page.id}>`}
+              />
             </ListItemIcon>
           </ListItemButton>
         </ListItem>
