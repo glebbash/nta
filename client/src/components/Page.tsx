@@ -1,4 +1,3 @@
-import { AcUnit, Typography } from "@mui";
 import { css } from "@emotion/css";
 
 import { useLoadPage } from "../utils/use-load-page";
@@ -16,8 +15,17 @@ export const Page = ({ id }) => {
 export const PageView = ({ page, onChange }) => {
   return (
     <div style={{ padding: "4px" }}>
-      <AcUnit color="primary" sx={{ width: 64, height: 64, m: 2 }} />
-      <Typography>{page.meta.title}</Typography>
+      <table style={{ border: "1px solid black" }}>
+        {Object.entries(page.meta).map(([k, v]) => {
+          return (
+            <tr key={k}>
+              <th>{k}</th>
+              <td>{"" + v}</td>
+            </tr>
+          );
+        })}
+      </table>
+
       <PageEditor
         initialContent={page.data}
         placeholder="Enter text..."

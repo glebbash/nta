@@ -8,20 +8,12 @@ struct FileInfo {
 }
 
 pub fn route() -> BoxedFilter<(impl Reply,)> {
-    warp::path!("api" / "fs" / ..)
-        .and(load_file().or(list_files()).or(save_file()))
-        .boxed()
+    load_file().or(save_file()).or(list_files()).boxed()
 }
 
 pub fn list_files() -> BoxedFilter<(impl Reply,)> {
     warp::get()
-        .and(warp::path::full().and_then(|path: FullPath| async move {
-            let path = path.as_str().to_string();
-            if !path.ends_with("/") {
-                return Err(warp::reject::not_found());
-            }
-            Ok(path["/api/fs/".len()..].to_string())
-        }))
+        .and(path_starting_with("/api/fs/", true))
         .map(|folder| {
             let pages = fs::read_dir(folder)
                 .unwrap()
@@ -36,14 +28,7 @@ pub fn list_files() -> BoxedFilter<(impl Reply,)> {
 
 pub fn load_file() -> BoxedFilter<(impl Reply,)> {
     warp::get()
-        .and(warp::path::full())
-        .and_then(|path: FullPath| async move {
-            let path = path.as_str().to_string();
-            if path.ends_with("/") {
-                return Err(warp::reject::not_found());
-            }
-            Ok(path["/api/fs/".len()..].to_string())
-        })
+        .and(path_starting_with("/api/fs/", false))
         .map(|path| {
             let data = fs::read_to_string(path).unwrap();
             Response::builder().body(data)
@@ -53,18 +38,23 @@ pub fn load_file() -> BoxedFilter<(impl Reply,)> {
 
 pub fn save_file() -> BoxedFilter<(impl Reply,)> {
     warp::post()
-        .and(warp::path::full())
-        .and_then(|path: FullPath| async move {
-            let path = path.as_str().to_string();
-            if path.ends_with("/") {
-                return Err(warp::reject::not_found());
-            }
-            Ok(path["/api/fs/".len()..].to_string())
-        })
+        .and(path_starting_with("/api/fs/", false))
         .and(warp::body::bytes())
         .map(|path, data| {
             fs::write(path, data).unwrap();
             warp::reply()
+        })
+        .boxed()
+}
+
+fn path_starting_with(prefix: &'static str, end_with_slash: bool) -> BoxedFilter<(String,)> {
+    warp::path::full()
+        .and_then(move |path: FullPath| async move {
+            let path = path.as_str().to_string();
+            if !path.starts_with(&prefix) || end_with_slash != path.ends_with("/") {
+                return Err(warp::reject::not_found());
+            }
+            Ok(path[prefix.len()..].to_string())
         })
         .boxed()
 }
