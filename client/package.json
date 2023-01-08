@@ -16,9 +16,14 @@
     "@remirror/pm": "^2.0.1",
     "@remirror/react": "^2.0.17",
     "@remirror/react-editors": "^1.0.17",
+    "@syncedstore/core": "^0.4.2",
+    "@syncedstore/react": "^0.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "remirror": "^2.0.16"
+    "remirror": "^2.0.16",
+    "y-indexeddb": "^9.0.9",
+    "y-webrtc": "^10.2.3",
+    "yjs": "^13.5.44"
   },
   "devDependencies": {
     "@types/react": "^18.0.24",
