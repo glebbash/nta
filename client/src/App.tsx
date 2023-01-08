@@ -1,53 +1,82 @@
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState, ReactNode, useEffect } from "react";
 import {
   Add,
   AppBar,
   Box,
   CssBaseline,
-  Search,
   IconButton,
   styled,
   Toolbar,
-  MoreVert,
   Save,
+  Edit,
+  Visibility,
 } from "@mui";
 
 import { useLoadPage } from "./utils/use-load-page";
-import { PageView } from "./components/Page";
-import { updatePage } from "./utils/api";
+import { savePage } from "./utils/api";
+import { MdEditor } from "./components/MdEditor";
+import { MdViewer } from "./components/MdViewer";
+
+type Mode = "edit" | "view";
 
 export function App() {
-  const [pageId, setPageId] = useState("page1");
+  const [pageId, setPageId] = useState("main");
+  const [mode, setMode] = useState<Mode>("edit");
 
   const { data: page, placeholder: pagePlaceholder } = useLoadPage(pageId);
+
+  const toggleMode = () => {
+    setMode(mode === "edit" ? "view" : "edit");
+  };
 
   const onSavePageClick = async () => {
     if (!page) return;
 
-    await updatePage(page);
+    await savePage(page);
 
     console.log("page saved");
   };
 
   useEffect(() => {
-    if (page) {
-      document.title = (page.meta.title as string) ?? "New page";
-    }
-  }, [page]);
+    const listener = (event: globalThis.KeyboardEvent) => {
+      if (
+        (event.code === "KeyI" && mode === "view") ||
+        (event.code === "Escape" && mode === "edit")
+      ) {
+        toggleMode();
+        return;
+      }
+      if (event.ctrlKey && event.code === "KeyS") {
+        onSavePageClick();
+        event.preventDefault();
+        return;
+      }
+    };
 
-  const pageComponent = pagePlaceholder ?? (
-    <PageView
-      page={page}
-      // @ts-ignore next
-      onChange={(data) => (page.data = data)}
-    />
-  );
+    document.addEventListener("keydown", listener);
+
+    return () => document.removeEventListener("keydown", listener);
+  });
+
+  let content: ReactNode = pagePlaceholder;
+  if (page) {
+    if (mode === "edit") {
+      content = (
+        <MdEditor
+          value={page.data}
+          onChange={(data: string) => (page.data = data)}
+        />
+      );
+    } else {
+      content = <MdViewer value={page.data} />;
+    }
+  }
 
   return (
     <Fragment>
       <CssBaseline />
-      <Box display={"block"} sx={{ pb: "64px", height: "100vh" }}>
-        {pageComponent}
+      <Box display="flex" sx={{ width: "100%", height: "100vh" }}>
+        {content}
       </Box>
       <StyledAppBar position="fixed" color="primary">
         <Toolbar>
@@ -55,14 +84,11 @@ export function App() {
           <IconButton color="inherit" onClick={onSavePageClick}>
             <Save />
           </IconButton>
-          <IconButton color="inherit">
-            <Search />
+          <IconButton color="inherit" onClick={toggleMode}>
+            {mode === "edit" ? <Visibility /> : <Edit />}
           </IconButton>
           <IconButton color="inherit">
             <Add />
-          </IconButton>
-          <IconButton color="inherit">
-            <MoreVert />
           </IconButton>
         </Toolbar>
       </StyledAppBar>

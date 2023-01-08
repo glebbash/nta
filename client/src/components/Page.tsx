@@ -1,7 +1,6 @@
-import { css } from "@emotion/css";
+import { MdEditor } from "./MdEditor";
 
 import { useLoadPage } from "../utils/use-load-page";
-import { PageEditor } from "./PageEditor";
 
 // @ts-ignore next
 export const Page = ({ id }) => {
@@ -13,32 +12,5 @@ export const Page = ({ id }) => {
 
 // @ts-ignore next
 export const PageView = ({ page, onChange }) => {
-  return (
-    <div style={{ padding: "4px" }}>
-      <table style={{ border: "1px solid black" }}>
-        {Object.entries(page.meta).map(([k, v]) => {
-          return (
-            <tr key={k}>
-              <th>{k}</th>
-              <td>{"" + v}</td>
-            </tr>
-          );
-        })}
-      </table>
-
-      <PageEditor
-        initialContent={page.data}
-        placeholder="Enter text..."
-        onChange={onChange}
-        classNames={[
-          css`
-            &.ProseMirror {
-              width: 100%;
-              box-shadow: none !important;
-            }
-          `,
-        ]}
-      />
-    </div>
-  );
+  return <div style={{ padding: "4px" }}></div>;
 };
