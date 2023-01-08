@@ -1,108 +1,108 @@
-import "@remirror/styles/all.css";
-
-import { FC, PropsWithChildren, useCallback } from "react";
-import jsx from "refractor/lang/jsx.js";
-import typescript from "refractor/lang/typescript.js";
-import { ExtensionPriority, RemirrorJSON } from "remirror";
 import {
-  BlockquoteExtension,
-  BoldExtension,
-  BulletListExtension,
-  CodeBlockExtension,
-  CodeExtension,
-  HardBreakExtension,
-  HeadingExtension,
-  ItalicExtension,
-  LinkExtension,
-  ListItemExtension,
-  MarkdownExtension,
-  OrderedListExtension,
-  PlaceholderExtension,
-  StrikeExtension,
-  TableExtension,
-  TrailingNodeExtension,
-} from "remirror/extensions";
-import {
-  EditorComponent,
-  OnChangeJSON,
-  Remirror,
-  ThemeProvider,
-  useRemirror,
-} from "@remirror/react";
-import { AllStyledComponent } from "@remirror/styles/emotion";
+  FormControlLabel,
+  Switch,
+  TextField,
+  Typography,
+  Box,
+  Button,
+  Checkbox,
+} from "@mui/material";
 
-import type { RemirrorProps } from "@remirror/react";
-import styled from "@emotion/styled";
+import { useSyncedPage } from "../hooks/useSyncedPage";
+import { Page } from "../utils/api";
+import { Item, ItemCtx, PageCtx } from "../utils/types";
+import { useState } from "react";
 
-export type MarkdownEditorProps = Partial<
-  Pick<
-    RemirrorProps,
-    "initialContent" | "editable" | "autoFocus" | "hooks" | "classNames"
-  >
-> & {
-  placeholder?: string;
-  onChange: (content: RemirrorJSON) => void;
+export function usePageEditorProps(props: {
+  ctx: PageCtx;
+  page: Page;
+  onChange: (page: Page) => void;
+}) {
+  const store = useSyncedPage(props.page);
+  const [selectedItems, setSelectedItems] = useState([] as string[]);
+
+  return { ...props, store, selectedItems, setSelectedItems };
+}
+
+export function PageEditor({
+  page,
+  ctx,
+  store,
+  selectedItems,
+  setSelectedItems,
+}: ReturnType<typeof usePageEditorProps>) {
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
+      <Typography variant="h4" sx={{ p: 2 }}>
+        Page #{page.id}
+      </Typography>
+      <Box id="content" sx={{ overflow: "auto", p: 2 }}>
+        {store.content.map((item) => (
+          <PageItem
+            key={item.id}
+            item={item}
+            ctx={ctx}
+            selected={selectedItems.includes(item.id)}
+            setSelected={(selected) => {
+              if (selected) {
+                setSelectedItems([...selectedItems, item.id]);
+              } else {
+                setSelectedItems(
+                  selectedItems.filter((itemId) => itemId != item.id)
+                );
+              }
+            }}
+          />
+        ))}
+      </Box>
+    </Box>
+  );
+}
+
+type ItemProps = {
+  ctx: PageCtx;
+  item: Item;
+  selected: boolean;
+  setSelected: (selected: boolean) => void;
 };
 
-const StyledEditorComponent = styled(EditorComponent)(() => ({
-  width: "100%",
-}));
-
-/**
- * The editor which is used to create the annotation. Supports formatting.
- */
-export const PageEditor: FC<PropsWithChildren<MarkdownEditorProps>> = ({
-  placeholder,
-  children,
-  onChange,
-  ...rest
-}) => {
-  const extensions = useCallback(
-    () => [
-      new PlaceholderExtension({ placeholder }),
-      new LinkExtension({ autoLink: true }),
-      new BoldExtension(),
-      new StrikeExtension(),
-      new ItalicExtension(),
-      new HeadingExtension(),
-      new LinkExtension(),
-      new BlockquoteExtension(),
-      new BulletListExtension({ enableSpine: true }),
-      new OrderedListExtension(),
-      new ListItemExtension({
-        priority: ExtensionPriority.High,
-        enableCollapsible: true,
-      }),
-      new CodeExtension(),
-      new CodeBlockExtension({ supportedLanguages: [jsx, typescript] }),
-      new TrailingNodeExtension(),
-      new TableExtension(),
-      new MarkdownExtension({ copyAsMarkdown: false }),
-      /**
-       * `HardBreakExtension` allows us to create a newline inside paragraphs.
-       * e.g. in a list item
-       */
-      new HardBreakExtension(),
-    ],
-    [placeholder]
+function PageItem({ item, ctx, selected, setSelected }: ItemProps) {
+  return (
+    <Box display="flex">
+      {ctx.mode === "edit" && (
+        <Checkbox
+          checked={selected}
+          onChange={(e) => setSelected(e.target.checked)}
+        />
+      )}
+      <PageItemContent item={item} />
+    </Box>
   );
+}
 
-  const { manager } = useRemirror({
-    extensions,
-    stringHandler: "markdown",
-  });
-
-  const mdExt = manager.getExtension(MarkdownExtension);
+function PageItemContent({ item }: { item: Item }) {
+  if (item.type === "text") {
+    return (
+      <TextField
+        value={item.value}
+        onChange={(e) => (item.value = e.target.value)}
+        fullWidth
+        multiline
+        sx={{ py: 1 }}
+      />
+    );
+  }
 
   return (
-    <AllStyledComponent>
-      <ThemeProvider>
-        <Remirror manager={manager} autoFocus {...rest}>
-          <StyledEditorComponent />
-          <OnChangeJSON onChange={onChange} />
-          {children}
-        </Remirror>
-      </ThemeProvider>
-    </AllStyledComponent>
+    <FormControlLabel
+      control={
+        <Switch
+          checked={item.checked}
+          onChange={(e) => (item.checked = e.target.checked)}
+        />
+      }
+      label="Some prop"
+      sx={{ py: 1 }}
+    />
   );
-};
+}
