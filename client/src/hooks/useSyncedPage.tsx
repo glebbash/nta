@@ -7,6 +7,7 @@ import { useEffect, useRef } from "react";
 import { Item } from "../utils/types";
 import { YPersistence } from "../utils/y-persistence";
 import { YServerStore } from "../utils/y-server-store";
+import { IndexeddbPersistence } from "y-indexeddb";
 
 export function useSyncedPage(page: Page) {
   const persistence = useRef<YPersistence>(null);
@@ -22,9 +23,8 @@ export function useSyncedPage(page: Page) {
       () => new YServerStore(page)
     );
     const providers = [
-      // TODO: check if indexdb has any value
-      // new IndexeddbPersistence(docId, doc),
       serverPersistence,
+      new IndexeddbPersistence(docId, doc),
       new WebrtcProvider(docId, doc),
     ];
 
