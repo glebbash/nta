@@ -12,11 +12,7 @@ import { Page } from "../utils/api";
 import { Item, PageCtx } from "../utils/types";
 import { useState } from "react";
 
-export function usePageEditorProps(props: {
-  ctx: PageCtx;
-  page: Page;
-  onChange: (page: Page) => void;
-}) {
+export function usePageEditorProps(props: { ctx: PageCtx; page: Page }) {
   const [store, persistence] = useSyncedPage(props.page);
   const [selectedItems, setSelectedItems] = useState([] as string[]);
 
