@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { loadPage } from "./utils/api";
-import { PageCtx } from "./utils/types";
 import { useQuery } from "./utils/use-query";
 import { PageScreen } from "./components/PageScreen";
 
@@ -11,12 +10,6 @@ export function App() {
   const { data: page, error } = useQuery(`page/${pageId}`, () =>
     loadPage(pageId)
   );
-
-  useEffect(() => {
-    if (page) {
-      document.title = (page.data.meta.title as string) ?? "New page";
-    }
-  }, [page]);
 
   if (error) {
     return <div>loading...</div>;
