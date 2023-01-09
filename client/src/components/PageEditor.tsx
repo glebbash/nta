@@ -4,13 +4,12 @@ import {
   TextField,
   Typography,
   Box,
-  Button,
   Checkbox,
 } from "@mui/material";
 
 import { useSyncedPage } from "../hooks/useSyncedPage";
 import { Page } from "../utils/api";
-import { Item, ItemCtx, PageCtx } from "../utils/types";
+import { Item, PageCtx } from "../utils/types";
 import { useState } from "react";
 
 export function usePageEditorProps(props: {
@@ -18,10 +17,16 @@ export function usePageEditorProps(props: {
   page: Page;
   onChange: (page: Page) => void;
 }) {
-  const store = useSyncedPage(props.page);
+  const [store, persistence] = useSyncedPage(props.page);
   const [selectedItems, setSelectedItems] = useState([] as string[]);
 
-  return { ...props, store, selectedItems, setSelectedItems };
+  return {
+    ...props,
+    store,
+    selectedItems,
+    setSelectedItems,
+    persistence,
+  };
 }
 
 export function PageEditor({
@@ -34,7 +39,7 @@ export function PageEditor({
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
       <Typography variant="h4" sx={{ p: 2 }}>
-        Page #{page.id}
+        {page.data.meta.title as string}
       </Typography>
       <Box id="content" sx={{ overflow: "auto", p: 2 }}>
         {store.content.map((item) => (
