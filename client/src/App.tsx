@@ -14,7 +14,7 @@ export function App() {
 
   useEffect(() => {
     if (page) {
-      document.title = (page.meta.title as string) ?? "New page";
+      document.title = (page.data.meta.title as string) ?? "New page";
     }
   }, [page]);
 

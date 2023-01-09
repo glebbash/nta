@@ -1,1 +1,40 @@
-{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Hello there"}]},{"type":"bulletList","content":[{"type":"listItem","attrs":{"closed":false,"nested":false},"content":[{"type":"paragraph","content":[{"type":"text","text":"list item"}]},{"type":"bulletList","content":[{"type":"listItem","attrs":{"closed":false,"nested":false},"content":[{"type":"paragraph","content":[{"type":"text","text":"nested"}]}]},{"type":"listItem","attrs":{"closed":false,"nested":false},"content":[{"type":"paragraph","content":[{"type":"text","text":"and stuff"}]}]}]}]},{"type":"listItem","attrs":{"closed":false,"nested":false},"content":[{"type":"paragraph","content":[{"type":"text","text":"dawdawd"}]}]}]},{"type":"paragraph"}]}
+{
+  "type": "Page",
+  "meta": {
+    "title": "Page 1"
+  },
+  "content": [
+    {
+      "id": "7b4ec20a-eb7b-484d-86d5-4072151a06ef",
+      "type": "switch",
+      "checked": false
+    },
+    {
+      "id": "5973ee0c-5b35-4c77-bdc1-6205b991d4dd",
+      "type": "text",
+      "value": "new"
+    }
+  ],
+  "history": [
+    "AQixt9nkDgAHAQdjb250ZW50ASgAsbfZ5A4AAmlkAXckN2I0ZWMyMGEtZWI3Yi00ODRkLTg2ZDUtNDA3MjE1MWEwNmVmKACxt9nkDgAEdHlwZQF3BnN3aXRjaCgAsbfZ5A4AB2NoZWNrZWQBeYext9nkDgABKACxt9nkDgQCaWQBdyQ1OTczZWUwYy01YjM1LTRjNzctYmRjMS02MjA1Yjk5MWQ0ZGQoALG32eQOBAR0eXBlAXcEdGV4dCgAsbfZ5A4EBXZhbHVlAXcDbmV3AA==",
+    "AAA=",
+    "AQHatZOhDgCosbfZ5A4HAXcBaAGxt9nkDgEHAQ==",
+    "AQHatZOhDgGo2rWToQ4AAXcCaGUB2rWToQ4BAAE=",
+    "AQHatZOhDgKo2rWToQ4BAXcDaGVsAdq1k6EOAQEB",
+    "AQHatZOhDgOo2rWToQ4CAXcEaGVsbAHatZOhDgECAQ==",
+    "AQHatZOhDgSo2rWToQ4DAXcFaGVsbG8B2rWToQ4BAwE=",
+    "AQHatZOhDgWo2rWToQ4EAXcGaGVsbG8gAdq1k6EOAQQB",
+    "AQHatZOhDgao2rWToQ4FAXcHaGVsbG8gdAHatZOhDgEFAQ==",
+    "AQHatZOhDgeo2rWToQ4GAXcIaGVsbG8gdGgB2rWToQ4BBgE=",
+    "AQHatZOhDgio2rWToQ4HAXcJaGVsbG8gdGhlAdq1k6EOAQcB",
+    "AQHatZOhDgmo2rWToQ4IAXcKaGVsbG8gdGhlcgHatZOhDgEIAQ==",
+    "AQHatZOhDgqo2rWToQ4JAXcLaGVsbG8gdGhlcmUB2rWToQ4BCQE=",
+    "AAGxt9nkDgEABA==",
+    "AAA=",
+    "AAA=",
+    "AAA=",
+    "AAA=",
+    "AAA=",
+    "AAA="
+  ]
+}

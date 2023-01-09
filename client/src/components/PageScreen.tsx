@@ -1,7 +1,7 @@
 import { Fragment, useState } from "react";
 import { Box, CssBaseline } from "@mui";
 
-import { Page, updatePage } from "../utils/api";
+import { Page, savePage } from "../utils/api";
 import { PageEditor, usePageEditorProps } from "./PageEditor";
 import { Autocomplete, Paper, TextField } from "@mui/material";
 import { PageCtx } from "../utils/types";
@@ -16,14 +16,15 @@ export function PageScreen({ page }: { page: Page }) {
   });
 
   const actions = {
-    "save page": async () => {
+    "clear editing history": async () => {
       if (!page) return;
 
-      await updatePage(page);
+      await savePage(page);
+      await pageProps.persistence.current?.forceStoreSnapshot();
 
-      console.log("page saved");
+      console.log("history cleared");
     },
-    edit: () => {
+    "edit / save": () => {
       setCtx({ ...ctx, mode: ctx.mode === "edit" ? "view" : "edit" });
     },
     "add text": () => {
