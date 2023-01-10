@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 
 import { Box, CssBaseline } from "@mui";
-import { Paper } from "@mui/material";
+import { Grid, Paper } from "@mui/material";
 import AbcIcon from "@mui/icons-material/Abc";
 import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import CompareIcon from "@mui/icons-material/Compare";
@@ -44,18 +44,23 @@ export function PageScreen({ page }: { page: Page }) {
           <PageEditor {...pageProps} />
         </Box>
         <Box sx={{ flexGrow: 1 }} />
-        <Paper sx={{ p: 2 }}>
-          <ActionPalette
-            actions={actions}
-            makeDefaultAction={(prompt) => ({
-              label: "Search: " + prompt,
-              icon: <SearchIcon />,
-              exec: () => {
-                alert("Search is not implemented yet");
-              },
-            })}
-          />
-        </Paper>
+        <Grid container justifyContent="center">
+          <Grid item xs={12} sm={6} lg={4}>
+            <Paper sx={{ m: 2 }}>
+              <ActionPalette
+                sx={{ width: "sm" }}
+                actions={actions}
+                makeDefaultAction={(prompt) => ({
+                  label: "Search: " + prompt,
+                  icon: <SearchIcon />,
+                  exec: () => {
+                    alert("Search is not implemented yet");
+                  },
+                })}
+              />
+            </Paper>
+          </Grid>
+        </Grid>
       </Box>
     </Fragment>
   );
