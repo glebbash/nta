@@ -1,6 +1,12 @@
 import { ReactNode, useState } from "react";
 
-import { Autocomplete, Box, TextField, Typography } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  SxProps,
+  TextField,
+  Typography,
+} from "@mui/material";
 import BoltIcon from "@mui/icons-material/Bolt";
 
 export type ActionDefinition = {
@@ -12,23 +18,23 @@ export type ActionDefinition = {
 export function ActionPalette({
   actions,
   makeDefaultAction,
+  sx = {},
 }: {
   actions: ActionDefinition[];
   makeDefaultAction: (prompt: string) => ActionDefinition;
+  sx?: SxProps;
 }) {
   const [command, setCommand] = useState("");
 
   return (
     <Autocomplete
+      sx={sx}
       inputValue={command}
       onInputChange={(_, value) => setCommand(value)}
       onChange={(_, action) => {
         action.exec();
         setCommand("");
       }}
-      autoHighlight
-      disableClearable
-      options={actions}
       filterOptions={(_, state) => {
         const input = state.inputValue;
         const results = actions.filter((action) =>
@@ -41,12 +47,6 @@ export function ActionPalette({
 
         return results;
       }}
-      renderOption={(props, option) => (
-        <Box component="li" {...props}>
-          {option.icon ?? <BoltIcon />}
-          <Typography sx={{ ml: 2 }}>{option.label}</Typography>
-        </Box>
-      )}
       renderInput={(params) => (
         <TextField
           {...params}
@@ -55,6 +55,16 @@ export function ActionPalette({
           type="search"
         />
       )}
+      renderOption={(props, option) => (
+        <Box component="li" {...props}>
+          {option.icon ?? <BoltIcon />}
+          <Typography sx={{ ml: 2 }}>{option.label}</Typography>
+        </Box>
+      )}
+      value={"" as never}
+      options={["" as never] as ActionDefinition[]}
+      autoHighlight
+      disableClearable
     />
   );
 }
