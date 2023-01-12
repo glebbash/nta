@@ -9,11 +9,13 @@ import { Item } from "../utils/types";
 import { YPersistence } from "../utils/y-persistence";
 import { YServerStore } from "../utils/y-server-store";
 
+export type PageData = MappedTypeDescription<{
+  content: Item[];
+  meta: Record<string, unknown>;
+}>;
+
 export type PagePersistence = {
-  data: MappedTypeDescription<{
-    content: Item[];
-    meta: Record<string, unknown>;
-  }> | null;
+  data: PageData | null;
   local: IndexeddbPersistence | null;
   remote: YPersistence | null;
 };
@@ -36,7 +38,12 @@ export function usePagePersistence(pageId: string) {
   });
 
   useEffect(() => {
+    const connectors = [] as { destroy(): void }[];
+
+    connectors.push(new WebrtcProvider(docId, doc));
+
     const localPersistence = new IndexeddbPersistence(docId, doc);
+    connectors.push(localPersistence);
     localPersistence.whenSynced.then(() => {
       setPersistence({ ...persistence, local: localPersistence, data });
     });
@@ -46,15 +53,10 @@ export function usePagePersistence(pageId: string) {
       doc,
       () => new YServerStore(pageId)
     );
+    connectors.push(remotePersistence);
     remotePersistence.whenSynced.then(() => {
       setPersistence({ ...persistence, remote: remotePersistence, data });
     });
-
-    const connectors = [
-      remotePersistence,
-      localPersistence,
-      new WebrtcProvider(docId, doc),
-    ];
 
     return () => {
       connectors.forEach((p) => p.destroy());
