@@ -35,7 +35,8 @@ export class YServerStore implements YStore {
     await savePage({
       id: page.id,
       data: {
-        ...page.data,
+        type: "Page",
+        meta: doc.getMap("meta").toJSON(),
         content: doc.getArray("content").toJSON(),
         history: newHistory,
       },

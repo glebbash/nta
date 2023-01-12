@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   FormControlLabel,
   Switch,
@@ -10,29 +9,39 @@ import {
 
 import { Item } from "../utils/types";
 import { PageContext } from "./PageScreen";
+import { getPageTitle } from "../utils/get-page-title";
+import { PageData } from "../hooks/usePagePersistence";
 
 export type PageEditorProps = {
-  title: string;
   ctx: PageContext;
-  items: Item[];
+  data: PageData;
   isSelected: (item: Item) => boolean;
   setSelected: (item: Item, selected: boolean) => void;
 };
 
 export function PageEditor({
-  title,
   ctx,
-  items,
+  data,
   isSelected,
   setSelected,
 }: PageEditorProps) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
-      <Typography variant="h4" sx={{ p: 2 }}>
-        {title}
-      </Typography>
+      {ctx.mode === "view" ? (
+        <Typography variant="h4" sx={{ p: 2 }}>
+          {getPageTitle(data.meta)}
+        </Typography>
+      ) : (
+        <TextField
+          value={getPageTitle(data.meta)}
+          onChange={(e) => (data.meta.title = e.target.value)}
+          fullWidth
+          multiline
+          sx={{ py: 1 }}
+        />
+      )}
       <Box id="content" sx={{ overflow: "auto", p: 2 }}>
-        {items.map((item) => (
+        {data.content.map((item) => (
           <PageItem
             key={item.id}
             item={item}

@@ -1,5 +1,4 @@
 import { Fragment, ReactNode, useEffect, useState } from "react";
-import useSWR from "swr";
 import { Box, CssBaseline } from "@mui";
 import { Grid, Paper } from "@mui/material";
 import AbcIcon from "@mui/icons-material/Abc";
@@ -17,6 +16,7 @@ import {
   PagePersistence,
   usePagePersistence,
 } from "../hooks/usePagePersistence";
+import { getPageTitle } from "../utils/get-page-title";
 
 export type Mode = "edit" | "view";
 
@@ -40,9 +40,9 @@ export function PageScreen() {
   const persistence = usePagePersistence(pageId);
 
   useEffect(() => {
-    if (persistence.data) {
-      document.title = (persistence.data.meta.title as string) ?? "New page";
-    }
+    if (!persistence.data) return;
+
+    document.title = getPageTitle(persistence.data.meta);
   }, [persistence.data]);
 
   const ctx: PageContext = {
@@ -98,9 +98,8 @@ function getPageComponent(ctx: PageContext): ReactNode {
 
   return (
     <PageEditor
-      title={(ctx.persistence.data.meta.title as string) ?? "New Page"}
       ctx={ctx}
-      items={ctx.persistence.data.content}
+      data={ctx.persistence.data}
       isSelected={(item) => ctx.selectedItems.includes(item.id)}
       setSelected={(item, selected) => {
         if (selected) {
@@ -189,7 +188,7 @@ function buildActions(ctx: PageContext): ActionDefinition[] {
             id: pageId,
             data: {
               type: "Page",
-              meta: { title: "New page # " + pageId },
+              meta: {},
               content: [],
               history: [],
             },
