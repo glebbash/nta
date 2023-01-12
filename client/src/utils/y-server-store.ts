@@ -5,10 +5,10 @@ import { YStore } from "./y-persistence";
 import { loadPage, Page, savePage } from "./api";
 
 export class YServerStore implements YStore {
-  constructor(private page: Page) {}
+  constructor(private pageId: Page["id"]) {}
 
   async pushUpdate(update: Uint8Array): Promise<number> {
-    const page = await loadPage(this.page.id);
+    const page = await loadPage(this.pageId); // TODO: this should be optimized
     const newHistory = [...page.data.history, fromUint8Array(update)];
 
     await savePage({
@@ -23,18 +23,19 @@ export class YServerStore implements YStore {
   }
 
   async getAllUpdates(): Promise<Uint8Array[]> {
-    const page = await loadPage(this.page.id);
+    const page = await loadPage(this.pageId);
     return page.data.history.map(toUint8Array);
   }
 
   async replaceWithSnapshot(doc: Y.Doc): Promise<void> {
+    const page = await loadPage(this.pageId);
     const update = Y.encodeStateAsUpdate(doc);
     const newHistory = [fromUint8Array(update)];
 
     await savePage({
-      id: this.page.id,
+      id: page.id,
       data: {
-        ...this.page.data,
+        ...page.data,
         content: doc.getArray("content").toJSON(),
         history: newHistory,
       },
