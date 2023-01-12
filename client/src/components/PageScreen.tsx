@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useState } from "react";
-
+import { Fragment, ReactNode, useEffect, useState } from "react";
+import useSWR from "swr";
 import { Box, CssBaseline } from "@mui";
 import { Grid, Paper } from "@mui/material";
 import AbcIcon from "@mui/icons-material/Abc";
@@ -8,27 +8,54 @@ import CompareIcon from "@mui/icons-material/Compare";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import UpdateDisabledIcon from "@mui/icons-material/UpdateDisabled";
 import SearchIcon from "@mui/icons-material/Search";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 
-import { PageCtx } from "../utils/types";
-import { Page, savePage } from "../utils/api";
-import { PageEditor, usePageEditorProps } from "./PageEditor";
+import { loadPage, Page, savePage } from "../utils/api";
+import { PageEditor } from "./PageEditor";
 import { ActionDefinition, ActionPalette } from "./ActionPalette";
+import {
+  PagePersistence,
+  usePagePersistence,
+} from "../hooks/usePagePersistence";
 
-export function PageScreen({ page }: { page: Page }) {
-  const [ctx, setCtx] = useState<PageCtx>({ mode: "view" });
+export type Mode = "edit" | "view";
+
+export type PageContext = {
+  mode: Mode;
+  setMode: (mode: Mode) => void;
+
+  pageId: Page["id"];
+  setPageId: (pageId: Page["id"]) => void;
+
+  selectedItems: string[];
+  setSelectedItems: (selectedItems: string[]) => void;
+
+  persistence: PagePersistence;
+};
+
+export function PageScreen() {
+  const [pageId, setPageId] = useState("page1");
+  const [mode, setMode] = useState<Mode>("view");
+  const [selectedItems, setSelectedItems] = useState([] as string[]);
+  const persistence = usePagePersistence(pageId);
 
   useEffect(() => {
-    if (page) {
-      document.title = (page.data.meta.title as string) ?? "New page";
+    if (persistence.data) {
+      document.title = (persistence.data.meta.title as string) ?? "New page";
     }
-  }, [page]);
+  }, [persistence.data]);
 
-  const pageProps = usePageEditorProps({
-    ctx,
-    page,
-  });
+  const ctx: PageContext = {
+    mode,
+    setMode,
+    pageId,
+    setPageId,
+    selectedItems,
+    setSelectedItems,
+    persistence,
+  };
 
-  const actions = buildActions(pageProps, setCtx);
+  const actions = buildActions(ctx);
 
   return (
     <Fragment>
@@ -41,7 +68,7 @@ export function PageScreen({ page }: { page: Page }) {
             minHeight: 0,
           }}
         >
-          <PageEditor {...pageProps} />
+          {getPageComponent(ctx)}
         </Box>
         <Box sx={{ flexGrow: 1 }} />
         <Grid container justifyContent="center">
@@ -66,16 +93,37 @@ export function PageScreen({ page }: { page: Page }) {
   );
 }
 
-function buildActions(
-  pageProps: ReturnType<typeof usePageEditorProps>,
-  setCtx: (ctx: PageCtx) => void
-): ActionDefinition[] {
+function getPageComponent(ctx: PageContext): ReactNode {
+  if (!ctx.persistence.data) return <div>Loading...</div>;
+
+  return (
+    <PageEditor
+      title={(ctx.persistence.data.meta.title as string) ?? "New Page"}
+      ctx={ctx}
+      items={ctx.persistence.data.content}
+      isSelected={(item) => ctx.selectedItems.includes(item.id)}
+      setSelected={(item, selected) => {
+        if (selected) {
+          ctx.setSelectedItems([...ctx.selectedItems, item.id]);
+        } else {
+          ctx.setSelectedItems(
+            ctx.selectedItems.filter((itemId) => itemId != item.id)
+          );
+        }
+      }}
+    />
+  );
+}
+
+function buildActions(ctx: PageContext): ActionDefinition[] {
   return [
     {
-      label: "Add Text",
+      label: "/Add Text",
       icon: <AbcIcon />,
       exec: () => {
-        pageProps.store.content.push({
+        if (!ctx.persistence.data) return; // TODO: there is a better way
+
+        ctx.persistence.data.content.push({
           id: crypto.randomUUID(),
           type: "text",
           value: "new",
@@ -83,10 +131,12 @@ function buildActions(
       },
     },
     {
-      label: "Add Toggle",
+      label: "/Add Toggle",
       icon: <ToggleOnIcon />,
       exec: () => {
-        pageProps.store.content.push({
+        if (!ctx.persistence.data) return; // TODO: there is a better way
+
+        ctx.persistence.data.content.push({
           id: crypto.randomUUID(),
           type: "switch",
           checked: false,
@@ -94,23 +144,22 @@ function buildActions(
       },
     },
     {
-      label: "Edit / Save",
+      label: "/Edit | Save",
       icon: <CompareIcon />,
       exec: () => {
-        setCtx({
-          ...pageProps.ctx,
-          mode: pageProps.ctx.mode === "edit" ? "view" : "edit",
-        });
+        ctx.setMode(ctx.mode === "edit" ? "view" : "edit");
       },
     },
     {
-      label: "Delete Selected",
+      label: "/Delete Selected",
       icon: <DeleteForeverIcon />,
       exec: () => {
-        const items = pageProps.store.content;
+        if (!ctx.persistence.data) return; // TODO: there is a better way
+
+        const items = ctx.persistence.data.content;
         let index = 0;
         while (index < items.length) {
-          if (pageProps.selectedItems.includes(items[index].id)) {
+          if (ctx.selectedItems.includes(items[index].id)) {
             items.splice(index, 1);
             continue;
           }
@@ -119,13 +168,35 @@ function buildActions(
       },
     },
     {
-      label: "Clear Editing History",
+      label: "/Clear Editing History",
       icon: <UpdateDisabledIcon />,
       exec: async () => {
-        await savePage(pageProps.page);
-        await pageProps.persistence.current?.forceStoreSnapshot();
+        if (!ctx.persistence.remote) return;
 
+        await ctx.persistence.remote?.forceStoreSnapshot();
         console.log("history cleared");
+      },
+    },
+    {
+      label: "/Open page",
+      icon: <ExitToAppIcon />,
+      exec: async () => {
+        const pageId = prompt("Page id");
+        if (!pageId) return;
+
+        await loadPage(pageId).catch(async () => {
+          await savePage({
+            id: pageId,
+            data: {
+              type: "Page",
+              meta: { title: "New page # " + pageId },
+              content: [],
+              history: [],
+            },
+          });
+        });
+
+        ctx.setPageId(pageId);
       },
     },
   ];

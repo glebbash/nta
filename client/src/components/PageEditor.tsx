@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   FormControlLabel,
   Switch,
@@ -7,52 +8,37 @@ import {
   Checkbox,
 } from "@mui/material";
 
-import { useSyncedPage } from "../hooks/useSyncedPage";
-import { Page } from "../utils/api";
-import { Item, PageCtx } from "../utils/types";
-import { useState } from "react";
+import { Item } from "../utils/types";
+import { PageContext } from "./PageScreen";
 
-export function usePageEditorProps(props: { ctx: PageCtx; page: Page }) {
-  const [store, persistence] = useSyncedPage(props.page);
-  const [selectedItems, setSelectedItems] = useState([] as string[]);
-
-  return {
-    ...props,
-    store,
-    selectedItems,
-    setSelectedItems,
-    persistence,
-  };
-}
+export type PageEditorProps = {
+  title: string;
+  ctx: PageContext;
+  items: Item[];
+  isSelected: (item: Item) => boolean;
+  setSelected: (item: Item, selected: boolean) => void;
+};
 
 export function PageEditor({
-  page,
+  title,
   ctx,
-  store,
-  selectedItems,
-  setSelectedItems,
-}: ReturnType<typeof usePageEditorProps>) {
+  items,
+  isSelected,
+  setSelected,
+}: PageEditorProps) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
       <Typography variant="h4" sx={{ p: 2 }}>
-        {page.data.meta.title as string}
+        {title}
       </Typography>
       <Box id="content" sx={{ overflow: "auto", p: 2 }}>
-        {store.content.map((item) => (
+        {items.map((item) => (
           <PageItem
             key={item.id}
             item={item}
             ctx={ctx}
-            selected={selectedItems.includes(item.id)}
-            setSelected={(selected) => {
-              if (selected) {
-                setSelectedItems([...selectedItems, item.id]);
-              } else {
-                setSelectedItems(
-                  selectedItems.filter((itemId) => itemId != item.id)
-                );
-              }
-            }}
+            selected={isSelected(item)}
+            setSelected={(s) => setSelected(item, s)}
           />
         ))}
       </Box>
@@ -61,7 +47,7 @@ export function PageEditor({
 }
 
 type ItemProps = {
-  ctx: PageCtx;
+  ctx: PageContext;
   item: Item;
   selected: boolean;
   setSelected: (selected: boolean) => void;

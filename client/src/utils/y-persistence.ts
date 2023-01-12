@@ -51,7 +51,7 @@ export class YPersistence extends Observable<string> {
     this.doc.on("update", this.processDocUpdate);
     this.doc.on("destroy", this.destroy);
 
-    // TODO: why is there no await here?
+    // no await here as next await also handles this one (I think)
     this.store.pushUpdate(Y.encodeStateAsUpdate(this.doc));
 
     const updates = await this.store.getAllUpdates();
