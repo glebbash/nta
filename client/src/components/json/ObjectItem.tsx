@@ -1,19 +1,22 @@
 import {
   Box,
   Button,
-  IconButton,
+  Stack,
   Table,
   TableBody,
   TableCell,
   TableRow,
+  Typography,
 } from "@mui/material";
-import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
 import LoginIcon from "@mui/icons-material/Login";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 import { JsonObject, JsonValue } from "../../utils/types";
 import { FileContext } from "../JsonScreen";
 import { JsonItem } from "./JsonItem";
 import { getBaseValueForType } from "../../utils/json-utils";
+import { Popup } from "../Popup";
 
 export type ObjectItemProps = {
   ctx: FileContext;
@@ -24,10 +27,14 @@ export type ObjectItemProps = {
 
 export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
   if (preview) {
-    return <Box>{"{ ... }"}</Box>;
+    return (
+      <Box m={2}>
+        <Typography sx={{ fontWeight: "bold" }}>{"{ ... }"}</Typography>
+      </Box>
+    );
   }
 
-  const changeType = (key: string) => () => {
+  const changeType = (key: string) => {
     const type = prompt(
       "type: number | string | boolean | array | object | null"
     );
@@ -42,7 +49,7 @@ export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
     value[key] = newValue;
   };
 
-  const enter = (key: string) => () => {
+  const enter = (key: string) => {
     ctx.setJsonPath(ctx.jsonPath + "." + key);
   };
 
@@ -61,25 +68,32 @@ export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
             <TableRow key={key}>
               <TableCell>{key}</TableCell>
               <TableCell>
-                <Box display="flex">
-                  <IconButton
-                    aria-label="change type"
-                    onClick={changeType(key)}
-                  >
-                    <ChangeCircleIcon />
-                  </IconButton>
-                  <IconButton aria-label="change type" onClick={enter(key)}>
-                    <LoginIcon />
-                  </IconButton>
-                  <JsonItem
-                    ctx={ctx}
-                    preview={true}
-                    value={subValue}
-                    setValue={(newValue) => {
-                      value[key] = newValue;
-                    }}
+                <Stack direction="row">
+                  <Box sx={{ flexGrow: 1 }}>
+                    <JsonItem
+                      ctx={ctx}
+                      preview={true}
+                      value={subValue}
+                      setValue={(newValue) => {
+                        value[key] = newValue;
+                      }}
+                    />
+                  </Box>
+                  <Popup
+                    actions={[
+                      {
+                        label: "Change type",
+                        icon: <AutorenewIcon />,
+                        action: () => changeType(key),
+                      },
+                      {
+                        label: "Enter",
+                        icon: <LoginIcon />,
+                        action: () => enter(key),
+                      },
+                    ]}
                   />
-                </Box>
+                </Stack>
               </TableCell>
             </TableRow>
           ))}
