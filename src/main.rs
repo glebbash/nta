@@ -3,7 +3,6 @@ use warp::Filter;
 const STATIC_FILES_DIR: &str = "./client/dist";
 
 mod api;
-mod collab;
 
 #[tokio::main]
 async fn main() {
@@ -11,7 +10,6 @@ async fn main() {
 
     let routes = api::route()
         .with(warp::cors().allow_any_origin())
-        .or(collab::route().await)
         .or(static_files_route);
 
     warp::serve(routes).run(([0, 0, 0, 0], 8000)).await;
