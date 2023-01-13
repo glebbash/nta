@@ -16,6 +16,7 @@ import { FileContext } from "../JsonScreen";
 import { JsonItem } from "./JsonItem";
 import { setArrayItem } from "../../utils/yjs-utils";
 import { Popup } from "../Popup";
+import { buildJsonTypeActions } from "../../utils/json-type-actions";
 
 export type ArrayItemProps = {
   ctx: FileContext;
@@ -32,10 +33,6 @@ export function ArrayItem({ ctx, preview, value }: ArrayItemProps) {
       </Box>
     );
   }
-
-  const addItem = () => {
-    value.push(null);
-  };
 
   const changeType = (index: number) => {
     const type = prompt(
@@ -90,7 +87,12 @@ export function ArrayItem({ ctx, preview, value }: ArrayItemProps) {
           </ListItem>
         ))}
       </List>
-      <Button onClick={addItem}>Add item</Button>
+      <Popup
+        anchor={<Button>Add item</Button>}
+        actions={buildJsonTypeActions((jsonType) => {
+          value.push(getBaseValueForType(jsonType)!);
+        })}
+      />
     </Box>
   );
 }
