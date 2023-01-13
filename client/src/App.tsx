@@ -1,5 +1,5 @@
-import { PageScreen } from "./components/PageScreen";
+import { JsonScreen } from "./components/JsonScreen";
 
 export function App() {
-  return <PageScreen />;
+  return <JsonScreen />;
 }

@@ -1,4 +1,10 @@
-export type Item = { id: string } & (
-  | { type: "text"; value: string }
-  | { type: "switch"; checked: boolean }
-);
+export type JsonValue =
+  | number
+  | string
+  | boolean
+  | JsonArray
+  | JsonObject
+  | null;
+
+export type JsonArray = JsonValue[];
+export type JsonObject = { [key: string]: JsonValue };
