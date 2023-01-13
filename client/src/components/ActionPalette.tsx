@@ -51,7 +51,7 @@ export function ActionPalette({
         <TextField
           {...params}
           fullWidth
-          placeholder="/commands"
+          placeholder="Commands | Go to"
           type="search"
         />
       )}
