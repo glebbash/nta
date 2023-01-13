@@ -1,4 +1,4 @@
-import { Fragment, ReactNode, useCallback, useEffect, useState } from "react";
+import { Fragment, ReactNode, useState } from "react";
 import {
   Box,
   CssBaseline,
@@ -13,6 +13,8 @@ import SaveIcon from "@mui/icons-material/Save";
 import FileOpenIcon from "@mui/icons-material/FileOpen";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
+import UndoIcon from "@mui/icons-material/Undo";
+import RedoIcon from "@mui/icons-material/Redo";
 
 import { JsonEditor } from "./JsonEditor";
 import {
@@ -23,7 +25,6 @@ import { loadJsonFile, saveJsonFile } from "../utils/api/fs-api";
 import { findValueByJsonPath, getPathAtIndex } from "../utils/json-utils";
 import { Popup } from "./Popup";
 import { useHash } from "../hooks/useHash";
-import { JsonObject } from "../utils/types";
 import { replaceObjectContent } from "../utils/yjs-utils";
 
 export type Mode = "edit" | "view";
@@ -122,27 +123,17 @@ export function JsonScreen() {
                 <Popup
                   actions={[
                     {
-                      label: "Save file",
-                      icon: <SaveIcon />,
+                      label: "Undo",
+                      icon: <UndoIcon />,
                       action: async () => {
-                        if (!ctx.persistence.remote) return;
-
-                        await ctx.persistence.remote?.forceStoreSnapshot();
-                        console.log("history cleared");
+                        ctx.persistence.undoManager!.undo();
                       },
                     },
                     {
-                      label: "Open file (remote)",
-                      icon: <FileOpenIcon />,
+                      label: "Redo",
+                      icon: <RedoIcon />,
                       action: async () => {
-                        const fileName = prompt("File name");
-                        if (!fileName) return;
-
-                        await loadJsonFile(fileName).catch(async () => {
-                          await saveJsonFile(fileName, {});
-                        });
-
-                        ctx.setFileName(fileName);
+                        ctx.persistence.undoManager!.redo();
                       },
                     },
                     {
@@ -173,6 +164,30 @@ export function JsonScreen() {
                         }
 
                         replaceObjectContent(ctx.persistence.data!.$, data);
+                      },
+                    },
+                    {
+                      label: "Save file (remote)",
+                      icon: <SaveIcon />,
+                      action: async () => {
+                        if (!ctx.persistence.remote) return;
+
+                        await ctx.persistence.remote?.forceStoreSnapshot();
+                        console.log("history cleared");
+                      },
+                    },
+                    {
+                      label: "Open file (remote)",
+                      icon: <FileOpenIcon />,
+                      action: async () => {
+                        const fileName = prompt("File name");
+                        if (!fileName) return;
+
+                        await loadJsonFile(fileName).catch(async () => {
+                          await saveJsonFile(fileName, {});
+                        });
+
+                        ctx.setFileName(fileName);
                       },
                     },
                   ]}
@@ -206,7 +221,7 @@ function downloadFile(fileName: string, data: unknown) {
   const download = document.createElement("a");
   download.setAttribute("href", dataStr);
   download.setAttribute("download", fileName);
-  document.body.appendChild(download); // required for firefox
+  document.body.appendChild(download);
   download.click();
   download.remove();
 }

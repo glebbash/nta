@@ -3,7 +3,8 @@ import { fromUint8Array, toUint8Array } from "js-base64";
 
 import { YStore, YUpdate } from "./y-persistence";
 import { loadJsonFile, saveJsonFile } from "./api/fs-api";
-import { JsonArray, JsonObject, JsonValue } from "./types";
+import { JsonValue } from "./types";
+import { createYMap } from "./yjs-utils";
 
 export class YServerStore implements YStore {
   private historyFileName: string;
@@ -60,38 +61,4 @@ function jsonToUpdate(obj: JsonValue): YUpdate {
   createYMap(obj, doc.getMap("$"));
 
   return Y.encodeStateAsUpdate(doc);
-}
-
-function createYValue(value: JsonValue): unknown {
-  if (value === undefined) {
-    throw new Error("Invalid value");
-  }
-
-  if (
-    value === null ||
-    typeof value === "number" ||
-    typeof value === "string" ||
-    typeof value === "boolean"
-  ) {
-    return value;
-  }
-
-  if (Array.isArray(value)) {
-    return createYArray(value);
-  }
-
-  return createYMap(value);
-}
-
-function createYMap(obj: JsonObject, map = new Y.Map()) {
-  for (const [key, value] of Object.entries(obj)) {
-    map.set(key, createYValue(value));
-  }
-  return map;
-}
-
-function createYArray(values: JsonArray) {
-  const array = new Y.Array();
-  array.push(values.map(createYValue));
-  return array;
 }
