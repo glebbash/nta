@@ -1,1 +1,1 @@
-{"array":["131233"],"items":"12345","title":"Page 3","nestedObject":{"someProp":true},"test":{"string":"abc","number":"123","boolean":true,"null":null,"array":[],"object":{}}}
+{"title":"Page 3","props":{"a":1}}

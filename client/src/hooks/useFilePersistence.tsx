@@ -31,7 +31,6 @@ export function usePagePersistence(pageId: string): PagePersistence {
   useEffect(() => {
     const connectors = [] as { destroy(): void }[];
 
-    // TODO: enable
     connectors.push(new WebrtcProvider(docId, doc));
 
     const localPersistence = new IndexeddbPersistence(docId, doc);

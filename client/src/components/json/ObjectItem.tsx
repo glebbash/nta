@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  ListItemButton,
   Stack,
   Table,
   TableBody,
@@ -10,13 +11,15 @@ import {
 } from "@mui/material";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import LoginIcon from "@mui/icons-material/Login";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import { JsonObject, JsonValue } from "../../utils/types";
 import { FileContext } from "../JsonScreen";
 import { JsonItem } from "./JsonItem";
 import { getBaseValueForType } from "../../utils/json-utils";
 import { Popup } from "../Popup";
+import { removeObjectKey, renameObjectKey } from "../../utils/yjs-utils";
 
 export type ObjectItemProps = {
   ctx: FileContext;
@@ -34,6 +37,13 @@ export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
     );
   }
 
+  const renameKey = (key: string) => {
+    const newKey = prompt("key");
+    if (!newKey) return;
+
+    renameObjectKey(value, key, newKey);
+  };
+
   const changeType = (key: string) => {
     const type = prompt(
       "type: number | string | boolean | array | object | null"
@@ -47,10 +57,6 @@ export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
     }
 
     value[key] = newValue;
-  };
-
-  const enter = (key: string) => {
-    ctx.setJsonPath(ctx.jsonPath + "." + key);
   };
 
   const addKey = () => {
@@ -82,14 +88,24 @@ export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
                   <Popup
                     actions={[
                       {
+                        label: "Enter",
+                        icon: <LoginIcon />,
+                        action: () => ctx.setJsonPath(ctx.jsonPath + "." + key),
+                      },
+                      {
                         label: "Change type",
                         icon: <AutorenewIcon />,
                         action: () => changeType(key),
                       },
                       {
-                        label: "Enter",
-                        icon: <LoginIcon />,
-                        action: () => enter(key),
+                        label: "Rename key",
+                        icon: <DriveFileRenameOutlineIcon />,
+                        action: () => renameKey(key),
+                      },
+                      {
+                        label: "Delete key",
+                        icon: <DeleteIcon />,
+                        action: () => removeObjectKey(value, key),
                       },
                     ]}
                   />
