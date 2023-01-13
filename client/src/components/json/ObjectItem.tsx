@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  ListItemButton,
   Stack,
   Table,
   TableBody,
@@ -20,6 +19,7 @@ import { JsonItem } from "./JsonItem";
 import { getBaseValueForType } from "../../utils/json-utils";
 import { Popup } from "../Popup";
 import { removeObjectKey, renameObjectKey } from "../../utils/yjs-utils";
+import { buildJsonTypeActions } from "../../utils/json-type-actions";
 
 export type ObjectItemProps = {
   ctx: FileContext;
@@ -42,21 +42,6 @@ export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
     if (!newKey) return;
 
     renameObjectKey(value, key, newKey);
-  };
-
-  const changeType = (key: string) => {
-    const type = prompt(
-      "type: number | string | boolean | array | object | null"
-    );
-    if (!type) return;
-
-    const newValue = getBaseValueForType(type);
-    if (newValue === undefined) {
-      alert("Invalid type");
-      return;
-    }
-
-    value[key] = newValue;
   };
 
   const addKey = () => {
@@ -95,7 +80,16 @@ export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
                       {
                         label: "Change type",
                         icon: <AutorenewIcon />,
-                        action: () => changeType(key),
+                        layout: (node, popupKey, popupState) => (
+                          <Popup
+                            key={popupKey}
+                            anchor={node}
+                            actions={buildJsonTypeActions((jsonType) => {
+                              value[key] = getBaseValueForType(jsonType)!;
+                              popupState.close();
+                            })}
+                          />
+                        ),
                       },
                       {
                         label: "Rename key",
