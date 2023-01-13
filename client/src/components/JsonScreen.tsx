@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import FileOpenIcon from "@mui/icons-material/FileOpen";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 import { JsonEditor } from "./JsonEditor";
 import {
@@ -20,6 +22,9 @@ import {
 import { loadJsonFile, saveJsonFile } from "../utils/api/fs-api";
 import { findValueByJsonPath, getPathAtIndex } from "../utils/json-utils";
 import { Popup } from "./Popup";
+import { useHash } from "../hooks/useHash";
+import { JsonObject } from "../utils/types";
+import { replaceObjectContent } from "../utils/yjs-utils";
 
 export type Mode = "edit" | "view";
 
@@ -127,7 +132,7 @@ export function JsonScreen() {
                       },
                     },
                     {
-                      label: "Open file",
+                      label: "Open file (remote)",
                       icon: <FileOpenIcon />,
                       action: async () => {
                         const fileName = prompt("File name");
@@ -138,6 +143,36 @@ export function JsonScreen() {
                         });
 
                         ctx.setFileName(fileName);
+                      },
+                    },
+                    {
+                      label: "Export file",
+                      icon: <FileUploadIcon />,
+                      action: async () => {
+                        const fileName = prompt("File name");
+                        if (!fileName) return;
+
+                        downloadFile(fileName, ctx.persistence.data!.$);
+                      },
+                    },
+                    {
+                      label: "Import file",
+                      icon: <GetAppIcon />,
+                      action: async () => {
+                        const data = await selectFile("application/json")
+                          .then((f) => f.text())
+                          .then(JSON.parse);
+
+                        if (
+                          typeof data !== "object" ||
+                          data === null ||
+                          Array.isArray(data)
+                        ) {
+                          alert("Only json objects are supported");
+                          return;
+                        }
+
+                        replaceObjectContent(ctx.persistence.data!.$, data);
                       },
                     },
                   ]}
@@ -164,26 +199,29 @@ function getJsonComponent(ctx: FileContext): ReactNode {
   return <JsonEditor ctx={ctx} value={value} />;
 }
 
-const useHash = () => {
-  const [hash, setHash] = useState(() => window.location.hash);
+function downloadFile(fileName: string, data: unknown) {
+  const dataStr =
+    "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
 
-  const hashChangeHandler = useCallback(() => {
-    setHash(window.location.hash);
-  }, []);
+  const download = document.createElement("a");
+  download.setAttribute("href", dataStr);
+  download.setAttribute("download", fileName);
+  document.body.appendChild(download); // required for firefox
+  download.click();
+  download.remove();
+}
 
-  useEffect(() => {
-    window.addEventListener("hashchange", hashChangeHandler);
-    return () => {
-      window.removeEventListener("hashchange", hashChangeHandler);
+function selectFile(contentType: string): Promise<File> {
+  return new Promise((resolve) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.multiple = false;
+    input.accept = contentType;
+
+    input.onchange = () => {
+      resolve(input.files![0]);
     };
-  }, []);
 
-  const updateHash = useCallback(
-    (newHash: string) => {
-      if ("#" + newHash !== hash) window.location.hash = "#" + newHash;
-    },
-    [hash]
-  );
-
-  return [hash.slice(1), updateHash] as const;
-};
+    input.click();
+  });
+}

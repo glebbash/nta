@@ -4,9 +4,10 @@ import {
   IconButton,
   List,
   ListItem,
+  Stack,
   Typography,
 } from "@mui/material";
-import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
 import LoginIcon from "@mui/icons-material/Login";
 
 import { getBaseValueForType } from "../../utils/json-utils";
@@ -14,6 +15,7 @@ import { JsonArray, JsonValue } from "../../utils/types";
 import { FileContext } from "../JsonScreen";
 import { JsonItem } from "./JsonItem";
 import { setArrayItem } from "../../utils/yjs-utils";
+import { Popup } from "../Popup";
 
 export type ArrayItemProps = {
   ctx: FileContext;
@@ -35,7 +37,7 @@ export function ArrayItem({ ctx, preview, value }: ArrayItemProps) {
     value.push(null);
   };
 
-  const changeType = (index: number) => () => {
+  const changeType = (index: number) => {
     const type = prompt(
       "type: number | string | boolean | array | object | null"
     );
@@ -50,7 +52,7 @@ export function ArrayItem({ ctx, preview, value }: ArrayItemProps) {
     setArrayItem(value, index, newValue);
   };
 
-  const enter = (index: number) => () => {
+  const enter = (index: number) => {
     ctx.setJsonPath(ctx.jsonPath + "." + index);
   };
 
@@ -59,20 +61,32 @@ export function ArrayItem({ ctx, preview, value }: ArrayItemProps) {
       <List>
         {value.map((subValue, index) => (
           <ListItem key={index}>
-            <IconButton aria-label="change type" onClick={changeType(index)}>
-              <ChangeCircleIcon />
-            </IconButton>
-            <IconButton aria-label="change type" onClick={enter(index)}>
-              <LoginIcon />
-            </IconButton>
-            <JsonItem
-              ctx={ctx}
-              preview={preview}
-              value={subValue}
-              setValue={(newValue) => {
-                setArrayItem(value, index, newValue);
-              }}
-            />
+            <Stack direction="row" sx={{ width: "100%" }}>
+              <Box sx={{ flexGrow: 1 }}>
+                <JsonItem
+                  ctx={ctx}
+                  preview={true}
+                  value={subValue}
+                  setValue={(newValue) => {
+                    setArrayItem(value, index, newValue);
+                  }}
+                />
+              </Box>
+              <Popup
+                actions={[
+                  {
+                    label: "Change type",
+                    icon: <AutorenewIcon />,
+                    action: () => changeType(index),
+                  },
+                  {
+                    label: "Enter",
+                    icon: <LoginIcon />,
+                    action: () => enter(index),
+                  },
+                ]}
+              />
+            </Stack>
           </ListItem>
         ))}
       </List>
