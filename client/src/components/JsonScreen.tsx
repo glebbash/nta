@@ -10,17 +10,16 @@ import {
   Tooltip,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
-import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import FileOpenIcon from "@mui/icons-material/FileOpen";
 
 import { JsonEditor } from "./JsonEditor";
-import { ActionDefinition, ActionPalette } from "./ActionPalette";
 import {
   PagePersistence,
   usePagePersistence,
 } from "../hooks/useFilePersistence";
 import { loadJsonFile, saveJsonFile } from "../utils/api/fs-api";
 import { findValueByJsonPath, getPathAtIndex } from "../utils/json-utils";
+import { Popup } from "./Popup";
 
 export type Mode = "edit" | "view";
 
@@ -52,8 +51,6 @@ export function JsonScreen() {
     setJsonPath,
     persistence,
   };
-
-  const actions = buildActions(ctx);
 
   return (
     <Fragment>
@@ -98,9 +95,7 @@ export function JsonScreen() {
                 <Tooltip title="Local persistence">
                   <Typography
                     sx={{
-                      p: 0.5,
-                      my: 0.5,
-                      ml: 0.5,
+                      p: 1,
                       background: ctx.persistence.local ? "green" : "grey",
                       color: "white",
                     }}
@@ -111,9 +106,7 @@ export function JsonScreen() {
                 <Tooltip title="Remote persistence">
                   <Typography
                     sx={{
-                      p: 0.5,
-                      my: 0.5,
-                      mr: 0.5,
+                      p: 1,
                       background: ctx.persistence.remote ? "green" : "grey",
                       color: "white",
                     }}
@@ -121,18 +114,35 @@ export function JsonScreen() {
                     R
                   </Typography>
                 </Tooltip>
+                <Popup
+                  actions={[
+                    {
+                      label: "Save file",
+                      icon: <SaveIcon />,
+                      action: async () => {
+                        if (!ctx.persistence.remote) return;
+
+                        await ctx.persistence.remote?.forceStoreSnapshot();
+                        console.log("history cleared");
+                      },
+                    },
+                    {
+                      label: "Open file",
+                      icon: <FileOpenIcon />,
+                      action: async () => {
+                        const fileName = prompt("File name");
+                        if (!fileName) return;
+
+                        await loadJsonFile(fileName).catch(async () => {
+                          await saveJsonFile(fileName, {});
+                        });
+
+                        ctx.setFileName(fileName);
+                      },
+                    },
+                  ]}
+                />
               </Box>
-              <ActionPalette
-                sx={{ width: "sm" }}
-                actions={actions}
-                makeDefaultAction={(prompt) => ({
-                  label: "Go to: " + prompt,
-                  icon: <KeyboardDoubleArrowRightIcon />,
-                  exec: () => {
-                    setJsonPath(prompt);
-                  },
-                })}
-              />
             </Paper>
           </Grid>
         </Grid>
@@ -152,35 +162,6 @@ function getJsonComponent(ctx: FileContext): ReactNode {
   }
 
   return <JsonEditor ctx={ctx} value={value} />;
-}
-
-function buildActions(ctx: FileContext): ActionDefinition[] {
-  return [
-    {
-      label: "Save file",
-      icon: <SaveIcon />,
-      exec: async () => {
-        if (!ctx.persistence.remote) return;
-
-        await ctx.persistence.remote?.forceStoreSnapshot();
-        console.log("history cleared");
-      },
-    },
-    {
-      label: "Open file",
-      icon: <FileOpenIcon />,
-      exec: async () => {
-        const fileName = prompt("File name");
-        if (!fileName) return;
-
-        await loadJsonFile(fileName).catch(async () => {
-          await saveJsonFile(fileName, {});
-        });
-
-        ctx.setFileName(fileName);
-      },
-    },
-  ];
 }
 
 const useHash = () => {

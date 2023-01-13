@@ -1,4 +1,11 @@
-import { Box, Button, IconButton, List, ListItem } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  List,
+  ListItem,
+  Typography,
+} from "@mui/material";
 import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 import LoginIcon from "@mui/icons-material/Login";
 
@@ -17,7 +24,11 @@ export type ArrayItemProps = {
 
 export function ArrayItem({ ctx, preview, value }: ArrayItemProps) {
   if (preview) {
-    return <Box>[ ... ]</Box>;
+    return (
+      <Box m={2}>
+        <Typography sx={{ fontWeight: "bold" }}>[ ... ]</Typography>
+      </Box>
+    );
   }
 
   const addItem = () => {
