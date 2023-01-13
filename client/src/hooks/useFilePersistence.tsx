@@ -1,3 +1,4 @@
+import * as Y from "yjs";
 import syncedStore, { getYjsDoc } from "@syncedstore/core";
 import { useSyncedStore } from "@syncedstore/react";
 import { useEffect, useState } from "react";
@@ -10,6 +11,7 @@ import { YServerStore } from "../utils/y-server-store";
 
 export type PagePersistence = {
   data: { $: JsonObject } | null;
+  undoManager: Y.UndoManager | null;
   local: IndexeddbPersistence | null;
   remote: YPersistence | null;
 };
@@ -25,6 +27,8 @@ export function usePagePersistence(pageId: string): PagePersistence {
   const docId = `nta/pages/${pageId}`;
 
   const data = useSyncedStore(store, [pageId]);
+  const [undoManager, setUndoManager] =
+    useState<PagePersistence["undoManager"]>(null);
   const [local, setLocal] = useState<PagePersistence["local"]>(null);
   const [remote, setRemote] = useState<PagePersistence["remote"]>(null);
 
@@ -37,6 +41,7 @@ export function usePagePersistence(pageId: string): PagePersistence {
     connectors.push(localPersistence);
     localPersistence.whenSynced.then(() => {
       setLocal(localPersistence);
+      setUndoManager(new Y.UndoManager(doc.getMap("$")));
     });
 
     const remotePersistence = new YPersistence(
@@ -54,5 +59,10 @@ export function usePagePersistence(pageId: string): PagePersistence {
     };
   }, [pageId]);
 
-  return { data: data as never, local, remote };
+  return {
+    data: data as never,
+    undoManager,
+    local,
+    remote,
+  };
 }

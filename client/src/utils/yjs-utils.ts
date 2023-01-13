@@ -32,7 +32,41 @@ export function removeObjectKey(object: JsonObject, key: string) {
 export function replaceObjectContent(object: JsonObject, newData: JsonObject) {
   const yMap = getYjsValue(object) as Y.Map<JsonValue>;
   yMap.clear();
-  for (const [k, v] of Object.entries(newData)) {
-    yMap.set(k, v);
+  for (const [key, value] of Object.entries(newData)) {
+    yMap.set(key, createYValue(value));
   }
+}
+
+export function createYValue(value: JsonValue): any {
+  if (value === undefined) {
+    throw new Error("Invalid value");
+  }
+
+  if (
+    value === null ||
+    typeof value === "number" ||
+    typeof value === "string" ||
+    typeof value === "boolean"
+  ) {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return createYArray(value);
+  }
+
+  return createYMap(value);
+}
+
+export function createYMap(obj: JsonObject, map = new Y.Map()) {
+  for (const [key, value] of Object.entries(obj)) {
+    map.set(key, createYValue(value));
+  }
+  return map;
+}
+
+export function createYArray(values: JsonArray) {
+  const array = new Y.Array();
+  array.push(values.map(createYValue));
+  return array;
 }
