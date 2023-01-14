@@ -6,14 +6,10 @@ import { IndexeddbPersistence } from "y-indexeddb";
 import { WebrtcProvider } from "y-webrtc";
 import { JsonObject } from "../utils/types";
 
-import { YPersistence } from "../utils/y-persistence";
-import { YServerStore } from "../utils/y-server-store";
-
 export type PagePersistence = {
   data: { $: JsonObject } | null;
   undoManager: Y.UndoManager | null;
   local: IndexeddbPersistence | null;
-  remote: YPersistence | null;
 };
 
 const FILE_DATA_SHAPE = {
@@ -30,7 +26,6 @@ export function usePagePersistence(pageId: string): PagePersistence {
   const [undoManager, setUndoManager] =
     useState<PagePersistence["undoManager"]>(null);
   const [local, setLocal] = useState<PagePersistence["local"]>(null);
-  const [remote, setRemote] = useState<PagePersistence["remote"]>(null);
 
   useEffect(() => {
     const connectors = [] as { destroy(): void }[];
@@ -44,16 +39,6 @@ export function usePagePersistence(pageId: string): PagePersistence {
       setUndoManager(new Y.UndoManager(doc.getMap("$")));
     });
 
-    const remotePersistence = new YPersistence(
-      docId,
-      doc,
-      () => new YServerStore(pageId)
-    );
-    connectors.push(remotePersistence);
-    remotePersistence.whenSynced.then(() => {
-      setRemote(remotePersistence);
-    });
-
     return () => {
       connectors.forEach((p) => p.destroy());
     };
@@ -63,6 +48,5 @@ export function usePagePersistence(pageId: string): PagePersistence {
     data: data as never,
     undoManager,
     local,
-    remote,
   };
 }
