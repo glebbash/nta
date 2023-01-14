@@ -5,12 +5,9 @@ import {
   Breadcrumbs,
   Grid,
   Link,
-  Paper,
   Typography,
-  Tooltip,
+  Divider,
 } from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
-import FileOpenIcon from "@mui/icons-material/FileOpen";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import UndoIcon from "@mui/icons-material/Undo";
@@ -61,103 +58,96 @@ export function JsonScreen() {
     <Fragment>
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <CssBaseline />
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            minHeight: 0,
-          }}
-        >
-          {getJsonComponent(ctx)}
-        </Box>
+        <Grid container justifyContent="center">
+          <Grid item xs={12} sm={8} lg={8}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                minHeight: 0,
+              }}
+            >
+              {getJsonComponent(ctx)}
+            </Box>
+          </Grid>
+        </Grid>
+
         <Box sx={{ flexGrow: 1 }} />
+        <Divider />
         <Grid container justifyContent="center">
           <Grid item xs={12} sm={6} lg={4}>
-            <Paper sx={{ m: 2 }}>
-              <Box display="flex">
-                <Breadcrumbs
-                  aria-label="breadcrumb"
-                  sx={{ p: 1, flexGrow: 1 }}
-                  separator="."
-                >
-                  {jsonPath
-                    .split(".")
-                    .slice(0, -1)
-                    .map((key, index) => (
-                      <Link
-                        key={index}
-                        underline="hover"
-                        color="inherit"
-                        href={`#${getPathAtIndex(jsonPath, index)}`}
-                      >
-                        {key}
-                      </Link>
-                    ))}
-                  <Typography color="text.primary">
-                    {jsonPath.split(".").at(-1)}
-                  </Typography>
-                </Breadcrumbs>
-                <Tooltip title="Local persistence">
-                  <Typography
-                    sx={{
-                      p: 1,
-                      background: ctx.persistence.local ? "green" : "grey",
-                      color: "white",
-                    }}
-                  >
-                    L
-                  </Typography>
-                </Tooltip>
-                <Popup
-                  actions={[
-                    {
-                      label: "Undo",
-                      icon: <UndoIcon />,
-                      action: async () => {
-                        ctx.persistence.undoManager!.undo();
-                      },
+            <Box display="flex" sx={{ m: 2 }}>
+              <Breadcrumbs
+                aria-label="breadcrumb"
+                sx={{ p: 1, flexGrow: 1 }}
+                separator="."
+              >
+                {jsonPath
+                  .split(".")
+                  .slice(0, -1)
+                  .map((key, index) => (
+                    <Link
+                      key={index}
+                      underline="hover"
+                      color="inherit"
+                      href={`#${getPathAtIndex(jsonPath, index)}`}
+                    >
+                      {key}
+                    </Link>
+                  ))}
+                <Typography color="text.primary">
+                  {jsonPath.split(".").at(-1)}
+                </Typography>
+              </Breadcrumbs>
+              <Popup
+                actions={[
+                  {
+                    label: "Undo",
+                    icon: <UndoIcon />,
+                    action: async () => {
+                      ctx.persistence.undoManager!.undo();
                     },
-                    {
-                      label: "Redo",
-                      icon: <RedoIcon />,
-                      action: async () => {
-                        ctx.persistence.undoManager!.redo();
-                      },
+                  },
+                  {
+                    label: "Redo",
+                    icon: <RedoIcon />,
+                    action: async () => {
+                      ctx.persistence.undoManager!.redo();
                     },
-                    {
-                      label: "Export file",
-                      icon: <FileUploadIcon />,
-                      action: async () => {
-                        const fileName = prompt("File name");
-                        if (!fileName) return;
+                  },
+                  {
+                    label: "Export file",
+                    icon: <FileUploadIcon />,
+                    action: async () => {
+                      const fileName = prompt("File name");
+                      if (!fileName) return;
 
-                        downloadFile(fileName, ctx.persistence.data!.$);
-                      },
+                      downloadFile(fileName, ctx.persistence.data!.$);
                     },
-                    {
-                      label: "Import file",
-                      icon: <GetAppIcon />,
-                      action: async () => {
-                        const data = await selectFile("application/json")
-                          .then((f) => f.text())
-                          .then(JSON.parse);
+                  },
+                  {
+                    label: "Import file",
+                    icon: <GetAppIcon />,
+                    action: async () => {
+                      const data = await selectFile("application/json")
+                        .then((f) => f.text())
+                        .then(JSON.parse);
 
-                        if (
-                          typeof data !== "object" ||
-                          data === null ||
-                          Array.isArray(data)
-                        ) {
-                          alert("Only json objects are supported");
-                          return;
-                        }
+                      if (
+                        typeof data !== "object" ||
+                        data === null ||
+                        Array.isArray(data)
+                      ) {
+                        alert("Only json objects are supported");
+                        return;
+                      }
 
-                        replaceObjectContent(ctx.persistence.data!.$, data);
-                      },
+                      replaceObjectContent(ctx.persistence.data!.$, data);
                     },
-                  ]}
-                />
-              </Box>
-            </Paper>
+                  },
+                ]}
+              />
+            </Box>
           </Grid>
         </Grid>
       </Box>
