@@ -21,7 +21,6 @@ import {
   PagePersistence,
   usePagePersistence,
 } from "../hooks/useFilePersistence";
-import { loadJsonFile, saveJsonFile } from "../utils/api/fs-api";
 import { findValueByJsonPath, getPathAtIndex } from "../utils/json-utils";
 import { Popup } from "./Popup";
 import { useHash } from "../hooks/useHash";
@@ -109,17 +108,6 @@ export function JsonScreen() {
                     L
                   </Typography>
                 </Tooltip>
-                <Tooltip title="Remote persistence">
-                  <Typography
-                    sx={{
-                      p: 1,
-                      background: ctx.persistence.remote ? "green" : "grey",
-                      color: "white",
-                    }}
-                  >
-                    R
-                  </Typography>
-                </Tooltip>
                 <Popup
                   actions={[
                     {
@@ -164,30 +152,6 @@ export function JsonScreen() {
                         }
 
                         replaceObjectContent(ctx.persistence.data!.$, data);
-                      },
-                    },
-                    {
-                      label: "Save file (remote)",
-                      icon: <SaveIcon />,
-                      action: async () => {
-                        if (!ctx.persistence.remote) return;
-
-                        await ctx.persistence.remote?.forceStoreSnapshot();
-                        console.log("history cleared");
-                      },
-                    },
-                    {
-                      label: "Open file (remote)",
-                      icon: <FileOpenIcon />,
-                      action: async () => {
-                        const fileName = prompt("File name");
-                        if (!fileName) return;
-
-                        await loadJsonFile(fileName).catch(async () => {
-                          await saveJsonFile(fileName, {});
-                        });
-
-                        ctx.setFileName(fileName);
                       },
                     },
                   ]}
