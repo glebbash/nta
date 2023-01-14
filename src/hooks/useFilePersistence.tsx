@@ -20,7 +20,7 @@ export function usePagePersistence(pageId: string): PagePersistence {
   const store = syncedStore(FILE_DATA_SHAPE);
 
   const doc = getYjsDoc(store);
-  const docId = `nta/pages/${pageId}`;
+  const docId = `json-editor/${pageId}`;
 
   const data = useSyncedStore(store, [pageId]);
   const [undoManager, setUndoManager] =
