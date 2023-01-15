@@ -58,28 +58,15 @@ export function JsonScreen() {
     <Fragment>
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <CssBaseline />
-        <Grid
-          container
-          justifyContent="center"
-          sx={{ display: "flex", flexDirection: "column", minHeight: 0 }}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 0,
+          }}
         >
-          <Grid
-            item
-            xs={12}
-            md={8}
-            sx={{ display: "flex", flexDirection: "column", minHeight: 0 }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                minHeight: 0,
-              }}
-            >
-              {getJsonComponent(ctx)}
-            </Box>
-          </Grid>
-        </Grid>
+          {getJsonComponent(ctx)}
+        </Box>
 
         <Box sx={{ flexGrow: 1 }} />
         <Divider />
