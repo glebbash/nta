@@ -1,6 +1,6 @@
 import { JsonValue } from "../../utils/types";
 import { isArray } from "../../utils/yjs-utils";
-import { FileContext } from "../JsonScreen";
+import { FileContext } from "../../hooks/useFileContext";
 import { ArrayItem } from "./ArrayItem";
 import { BooleanItem } from "./BooleanItem";
 import { NullItem } from "./NullItem";

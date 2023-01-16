@@ -6,7 +6,7 @@ import { IndexeddbPersistence } from "y-indexeddb";
 import { WebrtcProvider } from "y-webrtc";
 import { JsonObject } from "../utils/types";
 
-export type PagePersistence = {
+export type FilePersistence = {
   data: { $: JsonObject } | null;
   undoManager: Y.UndoManager | null;
   local: IndexeddbPersistence | null;
@@ -16,16 +16,16 @@ const FILE_DATA_SHAPE = {
   $: {} as JsonObject,
 };
 
-export function usePagePersistence(pageId: string): PagePersistence {
+export function useFilePersistence(fileId: string): FilePersistence {
   const store = syncedStore(FILE_DATA_SHAPE);
 
   const doc = getYjsDoc(store);
-  const docId = `json-editor/${pageId}`;
+  const docId = `json-editor/${fileId}`;
 
-  const data = useSyncedStore(store, [pageId]);
+  const data = useSyncedStore(store, [fileId]);
   const [undoManager, setUndoManager] =
-    useState<PagePersistence["undoManager"]>(null);
-  const [local, setLocal] = useState<PagePersistence["local"]>(null);
+    useState<FilePersistence["undoManager"]>(null);
+  const [local, setLocal] = useState<FilePersistence["local"]>(null);
 
   useEffect(() => {
     const connectors = [] as { destroy(): void }[];
@@ -42,7 +42,7 @@ export function usePagePersistence(pageId: string): PagePersistence {
     return () => {
       connectors.forEach((p) => p.destroy());
     };
-  }, [pageId]);
+  }, [fileId]);
 
   return {
     data: data as never,

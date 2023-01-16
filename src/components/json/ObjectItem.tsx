@@ -14,7 +14,7 @@ import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutli
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import { JsonObject, JsonValue } from "../../utils/types";
-import { FileContext } from "../JsonScreen";
+import { FileContext } from "../../hooks/useFileContext";
 import { JsonItem } from "./JsonItem";
 import { getBaseValueForType } from "../../utils/json-utils";
 import { Popup } from "../Popup";
