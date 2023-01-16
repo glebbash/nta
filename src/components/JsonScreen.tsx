@@ -139,7 +139,7 @@ export function JsonScreen() {
 }
 
 function getJsonComponent(ctx: FileContext): ReactNode {
-  if (!ctx.persistence.data) return <div>Loading...</div>;
+  if (!ctx.persistence.local) return <div>Loading...</div>;
 
   const value = findValueByJsonPath(ctx.persistence.data, ctx.jsonPath);
   if (value === undefined) {

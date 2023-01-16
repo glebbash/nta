@@ -7,7 +7,7 @@ import { WebrtcProvider } from "y-webrtc";
 import { JsonObject } from "../utils/types";
 
 export type FilePersistence = {
-  data: { $: JsonObject } | null;
+  data: { $: JsonObject };
   undoManager: Y.UndoManager | null;
   local: IndexeddbPersistence | null;
 };
