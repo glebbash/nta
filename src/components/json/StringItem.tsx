@@ -10,10 +10,28 @@ export type StringItemProps = {
   setValue: (value: JsonValue) => void;
 };
 
-export function StringItem({ value, setValue }: StringItemProps) {
+export function StringItem({ value, setValue, preview }: StringItemProps) {
+  if (preview) {
+    const lines = value.split("\n");
+    return (
+      <Box>
+        <TextField
+          value={lines[0]}
+          onChange={(e) =>
+            setValue(e.target.value + "\n" + lines.slice(1).join("\n"))
+          }
+        />
+      </Box>
+    );
+  }
+
   return (
     <Box>
-      <TextField value={value} onChange={(e) => setValue(e.target.value)} />
+      <TextField
+        multiline={!preview}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
     </Box>
   );
 }
