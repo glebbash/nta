@@ -72,5 +72,5 @@ function parseFileIdAndJsonPath(hash: string): {
   jsonPath: string;
 } {
   const [fileId, jsonPath] = hash.split("$", 2);
-  return { fileId, jsonPath: "$" + jsonPath };
+  return { fileId, jsonPath: "$" + jsonPath ?? "" };
 }
