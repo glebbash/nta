@@ -32,7 +32,9 @@ export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
   if (preview) {
     return (
       <Box m={2}>
-        <Typography sx={{ fontWeight: "bold" }}>{"{ ... }"}</Typography>
+        <Typography sx={{ fontWeight: "bold" }}>
+          {Object.keys(value).length > 0 ? "{ ... }" : "{ }"}
+        </Typography>
       </Box>
     );
   }

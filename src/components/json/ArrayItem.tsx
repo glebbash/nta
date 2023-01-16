@@ -22,7 +22,9 @@ export function ArrayItem({ ctx, preview, value }: ArrayItemProps) {
   if (preview) {
     return (
       <Box m={2}>
-        <Typography sx={{ fontWeight: "bold" }}>[ ... ]</Typography>
+        <Typography sx={{ fontWeight: "bold" }}>
+          {value.length > 0 ? "[ ... ]" : "[ ]"}
+        </Typography>
       </Box>
     );
   }
