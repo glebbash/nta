@@ -6,8 +6,15 @@ import {
   List,
   ListItem,
   ListItemText,
+  ListItemButton,
+  DialogActions,
+  Button,
+  Typography,
 } from "@mui/material";
-import { FileContext } from "../hooks/useFileContext";
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+import { FileContext, JsonFile } from "../hooks/useFileContext";
 import { Popup } from "./Popup";
 
 export type FileExplorerProps = {
@@ -17,6 +24,45 @@ export type FileExplorerProps = {
 };
 
 export function FileExplorer({ ctx, open, setOpen }: FileExplorerProps) {
+  const buildFileActions = (file: JsonFile) => [
+    {
+      label: "Rename",
+      icon: <DriveFileRenameOutlineIcon />,
+      action: () => {
+        const newName = prompt("New file name");
+        if (!newName) return;
+
+        ctx.setFileNames({ ...ctx.fileNames, [file.id]: newName });
+      },
+    },
+    {
+      label: "Delete",
+      icon: <DeleteIcon />,
+      action: () => {
+        ctx.setFileHistory(ctx.fileHistory.filter((_) => _.id !== file.id));
+        ctx.setFileNames(
+          Object.fromEntries(
+            Object.entries(ctx.fileNames).filter(
+              ([fileId]) => fileId !== file.id
+            )
+          )
+        );
+      },
+    },
+  ];
+
+  const openFile = (file: JsonFile) => {
+    ctx.setFileId(file.id);
+    ctx.setJsonPath(file.jsonPath);
+    setOpen(false);
+  };
+
+  const createFile = () => {
+    ctx.setFileId(crypto.randomUUID());
+    ctx.setJsonPath("$");
+    setOpen(false);
+  };
+
   return (
     <div>
       <Dialog
@@ -27,22 +73,32 @@ export function FileExplorer({ ctx, open, setOpen }: FileExplorerProps) {
       >
         <DialogTitle>File Explorer</DialogTitle>
         <DialogContent dividers>
-          <DialogContentText tabIndex={-1}>
-            <List>
-              {ctx.fileHistory.map((file) => {
-                return (
-                  <ListItem
-                    key={file.id}
-                    disablePadding
-                    secondaryAction={<Popup actions={[]} />}
-                  >
-                    <ListItemText primary="new file" secondary={file.id} />
-                  </ListItem>
-                );
-              })}
-            </List>
-          </DialogContentText>
+          <List disablePadding>
+            {ctx.fileHistory.map((file) => {
+              return (
+                <ListItem
+                  key={file.id}
+                  disablePadding
+                  secondaryAction={<Popup actions={buildFileActions(file)} />}
+                >
+                  <ListItemButton onClick={() => openFile(file)}>
+                    <ListItemText
+                      primary={ctx.fileNames[file.id] ?? "New file"}
+                      secondary={
+                        <Typography fontFamily="monospace">
+                          {file.id}
+                        </Typography>
+                      }
+                    />
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
+          </List>
         </DialogContent>
+        <DialogActions>
+          <Button onClick={createFile}>Create file</Button>
+        </DialogActions>
       </Dialog>
     </div>
   );

@@ -54,6 +54,10 @@ export function useFileContext(): FileContext {
     navigateTo(fileId, newJsonPath);
   };
 
+  if (!fileHistory.find((f) => f.id === fileId)) {
+    navigateTo(fileId, jsonPath);
+  }
+
   return {
     fileId,
     setFileId,
