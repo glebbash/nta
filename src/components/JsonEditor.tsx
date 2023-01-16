@@ -1,17 +1,17 @@
 import { Box } from "@mui/material";
 
 import { JsonItem } from "./json/JsonItem";
-import { FileContext } from "./JsonScreen";
 import { JsonObject, JsonValue } from "../utils/types";
 import { findValueByJsonPath } from "../utils/json-utils";
 import { isArray, setArrayItem } from "../utils/yjs-utils";
+import { FileContext } from "../hooks/useFileContext";
 
-export type PageEditorProps = {
+export type JsonEditorProps = {
   ctx: FileContext;
   value: JsonValue;
 };
 
-export function JsonEditor({ ctx, value: data }: PageEditorProps) {
+export function JsonEditor({ ctx, value: data }: JsonEditorProps) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
       <Box id="content" sx={{ overflow: "auto", p: 2 }}>

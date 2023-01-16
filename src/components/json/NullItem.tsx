@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 
 import { JsonValue } from "../../utils/types";
-import { FileContext } from "../JsonScreen";
+import { FileContext } from "../../hooks/useFileContext";
 
 export type NullItemProps = {
   ctx: FileContext;

@@ -12,52 +12,29 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import UndoIcon from "@mui/icons-material/Undo";
 import RedoIcon from "@mui/icons-material/Redo";
+import FolderIcon from "@mui/icons-material/Folder";
 
 import { JsonEditor } from "./JsonEditor";
-import {
-  PagePersistence,
-  usePagePersistence,
-} from "../hooks/useFilePersistence";
 import { findValueByJsonPath, getPathAtIndex } from "../utils/json-utils";
 import { Popup } from "./Popup";
-import { useHash } from "../hooks/useHash";
 import { replaceObjectContent } from "../utils/yjs-utils";
-
-export type Mode = "edit" | "view";
-
-export type FileContext = {
-  mode: Mode;
-  setMode: (mode: Mode) => void;
-
-  fileName: string;
-  setFileName: (fileName: string) => void;
-
-  jsonPath: string;
-  setJsonPath: (jsonPath: string) => void;
-
-  persistence: PagePersistence;
-};
+import { saveLocalFile, selectLocalFile } from "../utils/fs-ops";
+import { FileContext, useFileContext } from "../hooks/useFileContext";
+import { FileExplorer } from "./FileExplorer";
 
 export function JsonScreen() {
-  const [fileName, setFileName] = useState("files/test.json");
-  const [mode, setMode] = useState<Mode>("view");
-  const [jsonPath, setJsonPath] = useHash();
-  const persistence = usePagePersistence(fileName);
-
-  const ctx: FileContext = {
-    mode,
-    setMode,
-    fileName,
-    setFileName,
-    jsonPath,
-    setJsonPath,
-    persistence,
-  };
+  const ctx = useFileContext();
+  const [fileExplorerOpen, setFileExplorerOpen] = useState(false);
 
   return (
     <Fragment>
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <CssBaseline />
+        <FileExplorer
+          ctx={ctx}
+          open={fileExplorerOpen}
+          setOpen={setFileExplorerOpen}
+        />
         <Box
           sx={{
             display: "flex",
@@ -78,7 +55,7 @@ export function JsonScreen() {
                 sx={{ p: 1, flexGrow: 1 }}
                 separator="."
               >
-                {jsonPath
+                {ctx.jsonPath
                   .split(".")
                   .slice(0, -1)
                   .map((key, index) => (
@@ -86,13 +63,16 @@ export function JsonScreen() {
                       key={index}
                       underline="hover"
                       color="inherit"
-                      href={`#${getPathAtIndex(jsonPath, index)}`}
+                      href={`#${ctx.fileId}${getPathAtIndex(
+                        ctx.jsonPath,
+                        index
+                      )}`}
                     >
                       {key}
                     </Link>
                   ))}
                 <Typography color="text.primary">
-                  {jsonPath.split(".").at(-1)}
+                  {ctx.jsonPath.split(".").at(-1)}
                 </Typography>
               </Breadcrumbs>
               <Popup
@@ -112,20 +92,27 @@ export function JsonScreen() {
                     },
                   },
                   {
+                    label: "File explorer",
+                    icon: <FolderIcon />,
+                    action: async () => {
+                      setFileExplorerOpen(true);
+                    },
+                  },
+                  {
                     label: "Export file",
                     icon: <FileUploadIcon />,
                     action: async () => {
                       const fileName = prompt("File name");
                       if (!fileName) return;
 
-                      downloadFile(fileName, ctx.persistence.data!.$);
+                      saveLocalFile(fileName, ctx.persistence.data!.$);
                     },
                   },
                   {
                     label: "Import file",
                     icon: <GetAppIcon />,
                     action: async () => {
-                      const data = await selectFile("application/json")
+                      const data = await selectLocalFile("application/json")
                         .then((f) => f.text())
                         .then(JSON.parse);
 
@@ -162,31 +149,4 @@ function getJsonComponent(ctx: FileContext): ReactNode {
   }
 
   return <JsonEditor ctx={ctx} value={value} />;
-}
-
-function downloadFile(fileName: string, data: unknown) {
-  const dataStr =
-    "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-
-  const download = document.createElement("a");
-  download.setAttribute("href", dataStr);
-  download.setAttribute("download", fileName);
-  document.body.appendChild(download);
-  download.click();
-  download.remove();
-}
-
-function selectFile(contentType: string): Promise<File> {
-  return new Promise((resolve) => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.multiple = false;
-    input.accept = contentType;
-
-    input.onchange = () => {
-      resolve(input.files![0]);
-    };
-
-    input.click();
-  });
 }

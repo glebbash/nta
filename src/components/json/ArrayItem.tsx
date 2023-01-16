@@ -1,18 +1,11 @@
-import {
-  Box,
-  Button,
-  IconButton,
-  List,
-  ListItem,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Button, List, ListItem, Stack, Typography } from "@mui/material";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import LoginIcon from "@mui/icons-material/Login";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import { getBaseValueForType } from "../../utils/json-utils";
 import { JsonArray, JsonValue } from "../../utils/types";
-import { FileContext } from "../JsonScreen";
+import { FileContext } from "../../hooks/useFileContext";
 import { JsonItem } from "./JsonItem";
 import { setArrayItem } from "../../utils/yjs-utils";
 import { Popup } from "../Popup";
@@ -34,25 +27,6 @@ export function ArrayItem({ ctx, preview, value }: ArrayItemProps) {
     );
   }
 
-  const changeType = (index: number) => {
-    const type = prompt(
-      "type: number | string | boolean | array | object | null"
-    );
-    if (!type) return;
-
-    const newValue = getBaseValueForType(type);
-    if (newValue === undefined) {
-      alert("Invalid type");
-      return;
-    }
-
-    setArrayItem(value, index, newValue);
-  };
-
-  const enter = (index: number) => {
-    ctx.setJsonPath(ctx.jsonPath + "." + index);
-  };
-
   return (
     <Box>
       <List>
@@ -72,14 +46,29 @@ export function ArrayItem({ ctx, preview, value }: ArrayItemProps) {
               <Popup
                 actions={[
                   {
-                    label: "Change type",
-                    icon: <AutorenewIcon />,
-                    action: () => changeType(index),
-                  },
-                  {
                     label: "Enter",
                     icon: <LoginIcon />,
-                    action: () => enter(index),
+                    action: () => ctx.setJsonPath(ctx.jsonPath + "." + index),
+                  },
+                  {
+                    label: "Change type",
+                    icon: <AutorenewIcon />,
+                    layout: (node, popupKey, popupState) => (
+                      <Popup
+                        key={popupKey}
+                        anchor={node}
+                        actions={buildJsonTypeActions((jsonType) => {
+                          const newValue = getBaseValueForType(jsonType)!;
+                          setArrayItem(value, index, newValue);
+                          popupState.close();
+                        })}
+                      />
+                    ),
+                  },
+                  {
+                    label: "Delete item",
+                    icon: <DeleteIcon />,
+                    action: () => value.splice(index, 1),
                   },
                 ]}
               />
