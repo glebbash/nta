@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { FilePersistence, useFilePersistence } from "./useFilePersistence";
 import { useHash } from "./useHash";
 import { useLocalStorage } from "./useLocalStorage";
@@ -54,9 +55,15 @@ export function useFileContext(): FileContext {
     navigateTo(fileId, newJsonPath);
   };
 
-  if (!fileHistory.find((f) => f.id === fileId)) {
-    navigateTo(fileId, jsonPath);
-  }
+  useEffect(() => {
+    if (fileId === "") {
+      const lastOpenedFile = fileHistory[0];
+      console.log(lastOpenedFile.id, lastOpenedFile.jsonPath);
+      navigateTo(lastOpenedFile.id, lastOpenedFile.jsonPath);
+    } else if (!fileHistory.find((f) => f.id === fileId)) {
+      navigateTo(fileId, jsonPath);
+    }
+  }, [fileId]);
 
   return {
     fileId,
@@ -76,5 +83,5 @@ function parseFileIdAndJsonPath(hash: string): {
   jsonPath: string;
 } {
   const [fileId, jsonPath] = hash.split("$", 2);
-  return { fileId, jsonPath: "$" + jsonPath ?? "" };
+  return { fileId, jsonPath: "$" + (jsonPath ?? "") };
 }

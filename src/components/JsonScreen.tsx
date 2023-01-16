@@ -143,9 +143,9 @@ function getJsonComponent(ctx: FileContext): ReactNode {
 
   const value = findValueByJsonPath(ctx.persistence.data, ctx.jsonPath);
   if (value === undefined) {
-    alert("Invalid path: " + ctx.jsonPath);
-    ctx.setJsonPath("$");
-    return;
+    return (
+      <div>Path {ctx.jsonPath} does not exist or file is not fully loaded</div>
+    );
   }
 
   return <JsonEditor ctx={ctx} value={value} />;
