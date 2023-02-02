@@ -59,7 +59,7 @@ export function FileExplorer({ ctx, open, setOpen }: FileExplorerProps) {
 
   const createFile = () => {
     ctx.setFileId(crypto.randomUUID());
-    ctx.setJsonPath("$");
+    ctx.setJsonPath("~");
     setOpen(false);
   };
 

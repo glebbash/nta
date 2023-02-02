@@ -20,6 +20,7 @@ export function StringItem({ value, setValue, preview }: StringItemProps) {
           onChange={(e) =>
             setValue(e.target.value + "\n" + lines.slice(1).join("\n"))
           }
+          fullWidth
         />
       </Box>
     );

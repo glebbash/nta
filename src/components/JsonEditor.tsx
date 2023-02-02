@@ -27,7 +27,7 @@ export function JsonEditor({ ctx, value: data }: JsonEditorProps) {
             const parent = findValueByJsonPath(ctx.persistence.data!, path);
             if (parent === undefined) {
               alert("Invalid path: " + ctx.jsonPath);
-              ctx.setJsonPath("$");
+              ctx.setJsonPath("~");
               return;
             }
 
