@@ -7,13 +7,13 @@ import { WebrtcProvider } from "y-webrtc";
 import { JsonObject } from "../utils/types";
 
 export type FilePersistence = {
-  data: { $: JsonObject };
+  data: { ["~"]: JsonObject };
   undoManager: Y.UndoManager | null;
   local: IndexeddbPersistence | null;
 };
 
 const FILE_DATA_SHAPE = {
-  $: {} as JsonObject,
+  ["~"]: {} as JsonObject,
 };
 
 export function useFilePersistence(fileId: string): FilePersistence {

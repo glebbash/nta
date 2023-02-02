@@ -1,10 +1,20 @@
 import { useState, useCallback, useEffect } from "react";
 
+const getRealHash = () => {
+  if (window.location.hash === "") return "";
+
+  return "#" + decodeURIComponent(window.location.hash.slice(1));
+};
+
+const setRealHash = (hash: string) => {
+  window.location.hash = "#" + encodeURIComponent(hash.slice(1));
+};
+
 export const useHash = () => {
-  const [hash, setHash] = useState(() => window.location.hash);
+  const [hash, setHash] = useState(getRealHash);
 
   const hashChangeHandler = useCallback(() => {
-    setHash(window.location.hash);
+    setHash(getRealHash());
   }, []);
 
   useEffect(() => {
@@ -16,7 +26,9 @@ export const useHash = () => {
 
   const updateHash = useCallback(
     (newHash: string) => {
-      if ("#" + newHash !== hash) window.location.hash = "#" + newHash;
+      if ("#" + newHash === hash) return;
+
+      setRealHash("#" + newHash);
     },
     [hash]
   );

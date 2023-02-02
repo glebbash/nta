@@ -31,9 +31,9 @@ export function ArrayItem({ ctx, preview, value }: ArrayItemProps) {
 
   return (
     <Box>
-      <List>
+      <List disablePadding>
         {value.map((subValue, index) => (
-          <ListItem key={index}>
+          <ListItem key={index} disablePadding sx={{ py: 1 }}>
             <Stack direction="row" sx={{ width: "100%" }}>
               <Box sx={{ flexGrow: 1 }}>
                 <JsonItem

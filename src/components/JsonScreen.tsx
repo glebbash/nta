@@ -105,7 +105,7 @@ export function JsonScreen() {
                       const fileName = prompt("File name");
                       if (!fileName) return;
 
-                      saveLocalFile(fileName, ctx.persistence.data!.$);
+                      saveLocalFile(fileName, ctx.persistence.data!["~"]);
                     },
                   },
                   {
@@ -125,7 +125,7 @@ export function JsonScreen() {
                         return;
                       }
 
-                      replaceObjectContent(ctx.persistence.data!.$, data);
+                      replaceObjectContent(ctx.persistence.data!["~"], data);
                     },
                   },
                 ]}

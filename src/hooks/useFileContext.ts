@@ -31,7 +31,7 @@ export function useFileContext(): FileContext {
 
   const [fileHistory, setFileHistory] = useLocalStorage<JsonFile[]>(
     "fileHistory",
-    [{ id: crypto.randomUUID(), jsonPath: "$" }]
+    [{ id: crypto.randomUUID(), jsonPath: "~" }]
   );
 
   const [fileNames, setFileNames] = useLocalStorage<Record<string, string>>(
@@ -58,7 +58,6 @@ export function useFileContext(): FileContext {
   useEffect(() => {
     if (fileId === "") {
       const lastOpenedFile = fileHistory[0];
-      console.log(lastOpenedFile.id, lastOpenedFile.jsonPath);
       navigateTo(lastOpenedFile.id, lastOpenedFile.jsonPath);
     } else if (!fileHistory.find((f) => f.id === fileId)) {
       navigateTo(fileId, jsonPath);
@@ -82,6 +81,6 @@ function parseFileIdAndJsonPath(hash: string): {
   fileId: string;
   jsonPath: string;
 } {
-  const [fileId, jsonPath] = hash.split("$", 2);
-  return { fileId, jsonPath: "$" + (jsonPath ?? "") };
+  const [fileId, jsonPath] = hash.split("~", 2);
+  return { fileId, jsonPath: "~" + (jsonPath ?? "") };
 }

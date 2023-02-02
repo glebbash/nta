@@ -1,4 +1,4 @@
-import { Box, Switch } from "@mui/material";
+import { Box, Checkbox } from "@mui/material";
 
 import { JsonValue } from "../../utils/types";
 import { FileContext } from "../../hooks/useFileContext";
@@ -13,7 +13,7 @@ export type BooleanItemProps = {
 export function BooleanItem({ value, setValue }: BooleanItemProps) {
   return (
     <Box>
-      <Switch checked={value} onChange={(e) => setValue(e.target.checked)} />
+      <Checkbox checked={value} onChange={(e) => setValue(e.target.checked)} />
     </Box>
   );
 }

@@ -20,7 +20,7 @@ export function getBaseValueForType(type: string): JsonValue | undefined {
 }
 
 export function findValueByJsonPath(
-  data: { $: JsonObject },
+  data: { ["~"]: JsonObject },
   jsonPath: string
 ): JsonValue | undefined {
   const pathParts = jsonPath.split(".");
