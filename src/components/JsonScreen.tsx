@@ -15,12 +15,11 @@ import RedoIcon from "@mui/icons-material/Redo";
 import FolderIcon from "@mui/icons-material/Folder";
 
 import { JsonEditor } from "./JsonEditor";
-import { findValueByJsonPath, getPathAtIndex } from "../utils/json-utils";
 import { Popup } from "./Popup";
-import { replaceObjectContent } from "../utils/yjs-utils";
 import { saveLocalFile, selectLocalFile } from "../utils/fs-ops";
 import { FileContext, useFileContext } from "../hooks/useFileContext";
 import { FileExplorer } from "./FileExplorer";
+import { getValueOnPath, replaceObjectContent } from "../utils/json";
 
 export function JsonScreen() {
   const ctx = useFileContext();
@@ -141,7 +140,7 @@ export function JsonScreen() {
 function getJsonComponent(ctx: FileContext): ReactNode {
   if (!ctx.persistence.local) return <div>Loading...</div>;
 
-  const value = findValueByJsonPath(ctx.persistence.data, ctx.jsonPath);
+  const value = getValueOnPath(ctx.persistence.data, ctx.jsonPath);
   if (value === undefined) {
     return (
       <div>Path {ctx.jsonPath} does not exist or file is not fully loaded</div>
@@ -149,4 +148,11 @@ function getJsonComponent(ctx: FileContext): ReactNode {
   }
 
   return <JsonEditor ctx={ctx} value={value} />;
+}
+
+function getPathAtIndex(jsonPath: string, index: number): string {
+  return jsonPath
+    .split(".")
+    .slice(0, 1 + index)
+    .join(".");
 }

@@ -5,7 +5,9 @@ import DataObjectIcon from "@mui/icons-material/DataObject";
 import ToggleOffIcon from "@mui/icons-material/ToggleOff";
 import CloseIcon from "@mui/icons-material/Close";
 
-export function buildJsonTypeActions(onSelect: (jsonType: string) => void) {
+export function newCreateJsonValueActions(
+  onSelect: (jsonType: string) => void
+) {
   return [
     {
       label: "String",

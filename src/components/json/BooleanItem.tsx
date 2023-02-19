@@ -1,6 +1,6 @@
 import { Box, Checkbox } from "@mui/material";
 
-import { JsonValue } from "../../utils/types";
+import { JsonValue } from "../../utils/json";
 import { FileContext } from "../../hooks/useFileContext";
 
 export type BooleanItemProps = {
