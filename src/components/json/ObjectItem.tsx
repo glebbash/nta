@@ -4,13 +4,17 @@ import LoginIcon from "@mui/icons-material/Login";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { JsonObject, JsonValue } from "../../utils/types";
 import { FileContext } from "../../hooks/useFileContext";
 import { JsonItem } from "./JsonItem";
-import { getBaseValueForType } from "../../utils/json-utils";
 import { Popup } from "../Popup";
-import { removeObjectKey, renameObjectKey } from "../../utils/yjs-utils";
-import { buildJsonTypeActions } from "../../utils/json-type-actions";
+import { newCreateJsonValueActions } from "../../utils/create-json-value-actions";
+import {
+  JsonObject,
+  JsonValue,
+  renameObjectKey,
+  removeObjectKey,
+  getDefaultValueForType,
+} from "../../utils/json";
 
 export type ObjectItemProps = {
   ctx: FileContext;
@@ -75,8 +79,8 @@ export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
                       <Popup
                         key={popupKey}
                         anchor={node}
-                        actions={buildJsonTypeActions((jsonType) => {
-                          value[key] = getBaseValueForType(jsonType)!;
+                        actions={newCreateJsonValueActions((jsonType) => {
+                          value[key] = getDefaultValueForType(jsonType)!;
                           popupState.close();
                         })}
                       />

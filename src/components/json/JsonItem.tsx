@@ -1,5 +1,4 @@
-import { JsonValue } from "../../utils/types";
-import { isArray } from "../../utils/yjs-utils";
+import { JsonValue, isArray, isString } from "../../utils/json";
 import { FileContext } from "../../hooks/useFileContext";
 import { ArrayItem } from "./ArrayItem";
 import { BooleanItem } from "./BooleanItem";
@@ -37,7 +36,7 @@ export function JsonItem({ ctx, preview, value, setValue }: JsonItemProps) {
     );
   }
 
-  if (typeof value === "string") {
+  if (isString(value)) {
     return (
       <StringItem
         ctx={ctx}

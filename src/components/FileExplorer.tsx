@@ -2,7 +2,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
   List,
   ListItem,
   ListItemText,
@@ -52,8 +51,7 @@ export function FileExplorer({ ctx, open, setOpen }: FileExplorerProps) {
   ];
 
   const openFile = (file: JsonFile) => {
-    ctx.setFileId(file.id);
-    ctx.setJsonPath(file.jsonPath);
+    ctx.navigateTo(file.id, file.jsonPath);
     setOpen(false);
   };
 
@@ -75,6 +73,7 @@ export function FileExplorer({ ctx, open, setOpen }: FileExplorerProps) {
         <DialogContent dividers>
           <List disablePadding>
             {ctx.fileHistory.map((file) => {
+              const fileNamePrefix = file.id === ctx.fileId ? "-> " : "";
               return (
                 <ListItem
                   key={file.id}
@@ -83,7 +82,9 @@ export function FileExplorer({ ctx, open, setOpen }: FileExplorerProps) {
                 >
                   <ListItemButton onClick={() => openFile(file)}>
                     <ListItemText
-                      primary={ctx.fileNames[file.id] ?? "New file"}
+                      primary={
+                        fileNamePrefix + (ctx.fileNames[file.id] ?? "New file")
+                      }
                       secondary={
                         <Typography fontFamily="monospace">
                           {file.id}

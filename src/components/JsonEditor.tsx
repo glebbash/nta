@@ -1,10 +1,8 @@
 import { Box } from "@mui/material";
 
 import { JsonItem } from "./json/JsonItem";
-import { JsonObject, JsonValue } from "../utils/types";
-import { findValueByJsonPath } from "../utils/json-utils";
-import { isArray, setArrayItem } from "../utils/yjs-utils";
 import { FileContext } from "../hooks/useFileContext";
+import { JsonValue, setValueOnPath } from "../utils/json";
 
 export type JsonEditorProps = {
   ctx: FileContext;
@@ -20,21 +18,16 @@ export function JsonEditor({ ctx, value: data }: JsonEditorProps) {
           preview={false}
           value={data}
           setValue={(newValue) => {
-            const pathParts = ctx.jsonPath.split(".");
-            const key = pathParts.at(-1)!;
-            const path = pathParts.slice(0, -1).join(".");
+            const valueSet = setValueOnPath(
+              ctx.persistence.data,
+              ctx.jsonPath,
+              newValue
+            );
 
-            const parent = findValueByJsonPath(ctx.persistence.data!, path);
-            if (parent === undefined) {
+            if (!valueSet) {
               alert("Invalid path: " + ctx.jsonPath);
               ctx.setJsonPath("~");
               return;
-            }
-
-            if (isArray(parent)) {
-              setArrayItem(parent, +key, newValue);
-            } else {
-              (parent as JsonObject)[key] = newValue;
             }
           }}
         />

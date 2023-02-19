@@ -1,38 +1,51 @@
-import { Box, TextField } from "@mui/material";
+import { useEffect, useRef } from "react";
+import { Box } from "@mui/material";
+import { useCodeMirror } from "@uiw/react-codemirror";
+import { SyncedText } from "@syncedstore/core";
+import { yCollab } from "y-codemirror.next";
+import { markdown } from "@codemirror/lang-markdown";
+import { foldAll } from "@codemirror/language";
 
-import { JsonValue } from "../../utils/types";
+import { JsonValue } from "../../utils/json";
 import { FileContext } from "../../hooks/useFileContext";
 
 export type StringItemProps = {
   ctx: FileContext;
   preview: boolean;
-  value: string;
+  value: SyncedText;
   setValue: (value: JsonValue) => void;
 };
 
-export function StringItem({ value, setValue, preview }: StringItemProps) {
-  if (preview) {
-    const lines = value.split("\n");
-    return (
-      <Box>
-        <TextField
-          value={lines[0]}
-          onChange={(e) =>
-            setValue(e.target.value + "\n" + lines.slice(1).join("\n"))
-          }
-          fullWidth
-        />
-      </Box>
-    );
-  }
+export function StringItem({ ctx, value, preview }: StringItemProps) {
+  const editorRef = useRef();
+
+  const { view, setContainer } = useCodeMirror({
+    value: value.toString(),
+    container: editorRef.current!,
+    extensions: [
+      markdown(),
+      yCollab(value, ctx.persistence.syncProvider!.awareness, {
+        // TODO: support undoManager?
+        undoManager: false,
+      }),
+    ],
+  });
+
+  useEffect(() => {
+    if (editorRef.current) {
+      setContainer(editorRef.current);
+    }
+  }, [editorRef.current, preview]);
+
+  useEffect(() => {
+    if (preview && view) {
+      foldAll(view);
+    }
+  }, [view]);
 
   return (
     <Box>
-      <TextField
-        multiline={!preview}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      />
+      <div ref={editorRef as never} />
     </Box>
   );
 }

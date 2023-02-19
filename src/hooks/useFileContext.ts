@@ -9,6 +9,8 @@ export type JsonFile = {
 };
 
 export type FileContext = {
+  navigateTo: (fileId: string, jsonPath: string) => void;
+
   fileId: string;
   setFileId: (fileId: string) => void;
 
@@ -65,6 +67,7 @@ export function useFileContext(): FileContext {
   }, [fileId]);
 
   return {
+    navigateTo,
     fileId,
     setFileId,
     jsonPath,

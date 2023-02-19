@@ -3,13 +3,16 @@ import AutorenewIcon from "@mui/icons-material/Autorenew";
 import LoginIcon from "@mui/icons-material/Login";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { getBaseValueForType } from "../../utils/json-utils";
-import { JsonArray, JsonValue } from "../../utils/types";
 import { FileContext } from "../../hooks/useFileContext";
 import { JsonItem } from "./JsonItem";
-import { setArrayItem } from "../../utils/yjs-utils";
 import { Popup } from "../Popup";
-import { buildJsonTypeActions } from "../../utils/json-type-actions";
+import { newCreateJsonValueActions } from "../../utils/create-json-value-actions";
+import {
+  getDefaultValueForType,
+  JsonArray,
+  JsonValue,
+  setArrayItem,
+} from "../../utils/json";
 
 export type ArrayItemProps = {
   ctx: FileContext;
@@ -59,8 +62,8 @@ export function ArrayItem({ ctx, preview, value }: ArrayItemProps) {
                       <Popup
                         key={popupKey}
                         anchor={node}
-                        actions={buildJsonTypeActions((jsonType) => {
-                          const newValue = getBaseValueForType(jsonType)!;
+                        actions={newCreateJsonValueActions((jsonType) => {
+                          const newValue = getDefaultValueForType(jsonType)!;
                           setArrayItem(value, index, newValue);
                           popupState.close();
                         })}
@@ -80,8 +83,8 @@ export function ArrayItem({ ctx, preview, value }: ArrayItemProps) {
       </List>
       <Popup
         anchor={<Button>Add item</Button>}
-        actions={buildJsonTypeActions((jsonType) => {
-          value.push(getBaseValueForType(jsonType)!);
+        actions={newCreateJsonValueActions((jsonType) => {
+          value.push(getDefaultValueForType(jsonType)!);
         })}
       />
     </Box>
