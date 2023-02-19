@@ -49,7 +49,9 @@ export function useFilePersistence(fileId: string): FilePersistence {
   useEffect(() => {
     const connectors = [] as { destroy(): void }[];
 
-    const syncProvider = new WebrtcProvider(docId, doc);
+    const syncProvider = new WebrtcProvider(docId, doc, {
+      signaling: ["wss://yjs-signaling.deno.dev/"],
+    } as never);
     connectors.push(syncProvider);
 
     const localPersistence = new IndexeddbPersistence(docId, doc);
