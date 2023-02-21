@@ -22,6 +22,7 @@ export function StringItem({ ctx, value, preview }: StringItemProps) {
   const { view, setContainer } = useCodeMirror({
     value: value.toString(),
     container: editorRef.current!,
+    basicSetup: { lineNumbers: false },
     extensions: [
       markdown(),
       yCollab(value, ctx.persistence.syncProvider!.awareness, {
