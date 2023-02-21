@@ -4,7 +4,6 @@ import { useSyncedStore } from "@syncedstore/react";
 import { useEffect, useState } from "react";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { WebrtcProvider } from "y-webrtc";
-import * as random from "lib0/random";
 
 import { JsonObject } from "../utils/json";
 
@@ -19,7 +18,7 @@ const FILE_DATA_SHAPE = {
   ["~"]: {} as JsonObject,
 };
 
-export const usercolors = [
+export const USER_COLORS = [
   { color: "#30bced", light: "#30bced33" },
   { color: "#6eeb83", light: "#6eeb8333" },
   { color: "#ffbc42", light: "#ffbc4233" },
@@ -30,8 +29,10 @@ export const usercolors = [
   { color: "#1be7ff", light: "#1be7ff33" },
 ];
 
-// select a random color for this user
-export const userColor = usercolors[random.uint32() % usercolors.length];
+const RANDOM_USER_CONFIG = {
+  name: "Anonymous " + Math.floor(Math.random() * 100),
+  ...USER_COLORS[Math.floor(USER_COLORS.length * Math.random())],
+};
 
 export function useFilePersistence(fileId: string): FilePersistence {
   const store = syncedStore(FILE_DATA_SHAPE);
@@ -40,42 +41,35 @@ export function useFilePersistence(fileId: string): FilePersistence {
   const docId = `json-editor/${fileId}`;
 
   const data = useSyncedStore(store, [fileId]);
-  const [undoManager, setUndoManager] =
-    useState<FilePersistence["undoManager"]>(null);
-  const [local, setLocal] = useState<FilePersistence["local"]>(null);
-  const [syncProvider, setSyncProvider] =
-    useState<FilePersistence["syncProvider"]>(null);
+  const [filePersistence, setFilePersistence] = useState<FilePersistence>({
+    data: data as never,
+    undoManager: null,
+    local: null,
+    syncProvider: null,
+  });
 
   useEffect(() => {
-    const connectors = [] as { destroy(): void }[];
-
+    const localPersistence = new IndexeddbPersistence(docId, doc);
     const syncProvider = new WebrtcProvider(docId, doc, {
       signaling: ["wss://yjs-signaling.deno.dev/"],
     } as never);
-    connectors.push(syncProvider);
 
-    const localPersistence = new IndexeddbPersistence(docId, doc);
-    connectors.push(localPersistence);
+    syncProvider.awareness.setLocalStateField("user", RANDOM_USER_CONFIG);
+
     localPersistence.whenSynced.then(() => {
-      syncProvider.awareness.setLocalStateField("user", {
-        name: "Anonymous " + Math.floor(Math.random() * 100),
-        color: userColor.color,
-        colorLight: userColor.light,
+      setFilePersistence({
+        data: data as never,
+        undoManager: new Y.UndoManager(doc.getMap("$")),
+        local: localPersistence,
+        syncProvider,
       });
-      setLocal(localPersistence);
-      setSyncProvider(syncProvider);
-      setUndoManager(new Y.UndoManager(doc.getMap("$")));
     });
 
     return () => {
-      connectors.forEach((p) => p.destroy());
+      syncProvider.destroy();
+      localPersistence.destroy();
     };
   }, [fileId]);
 
-  return {
-    data: data as never,
-    undoManager,
-    local,
-    syncProvider,
-  };
+  return filePersistence;
 }
