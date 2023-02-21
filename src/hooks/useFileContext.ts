@@ -27,8 +27,8 @@ export type FileContext = {
 };
 
 export function useFileContext(): FileContext {
-  const [currentFileAndPath, setCurrentFileAndPath] = useHash();
-  const { fileId, jsonPath } = parseFileIdAndJsonPath(currentFileAndPath);
+  const [fileAndPathHash, setFileAndPathHash] = useHash();
+  const { fileId, jsonPath } = parseFileIdAndJsonPath(fileAndPathHash);
   const persistence = useFilePersistence(fileId);
 
   const [fileHistory, setFileHistory] = useLocalStorage<JsonFile[]>(
@@ -42,7 +42,7 @@ export function useFileContext(): FileContext {
   );
 
   const navigateTo = (fileId: string, jsonPath: string) => {
-    setCurrentFileAndPath(fileId + jsonPath);
+    setFileAndPathHash(fileId + jsonPath);
     setFileHistory([
       { id: fileId, jsonPath },
       ...fileHistory.filter((f) => f.id !== fileId),
