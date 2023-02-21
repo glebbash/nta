@@ -54,6 +54,7 @@ export function useFilePersistence(fileId: string): FilePersistence {
       signaling: ["wss://yjs-signaling.deno.dev/"],
     } as never);
 
+    // TODO: check why this works only sometimes
     syncProvider.awareness.setLocalStateField("user", RANDOM_USER_CONFIG);
 
     localPersistence.whenSynced.then(() => {
