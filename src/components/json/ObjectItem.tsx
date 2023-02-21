@@ -1,4 +1,4 @@
-import { Box, Button, List, Stack, Typography } from "@mui/material";
+import { Box, Button, List, Stack, TextField, Typography } from "@mui/material";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import LoginIcon from "@mui/icons-material/Login";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
@@ -15,6 +15,7 @@ import {
   removeObjectKey,
   getDefaultValueForType,
 } from "../../utils/json";
+import { useState } from "react";
 
 export type ObjectItemProps = {
   ctx: FileContext;
@@ -24,6 +25,8 @@ export type ObjectItemProps = {
 };
 
 export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
+  const [newKey, setNewKey] = useState("");
+
   if (preview) {
     return (
       <Box m={2}>
@@ -41,11 +44,12 @@ export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
     renameObjectKey(value, key, newKey);
   };
 
-  const addKey = () => {
-    const key = prompt("key");
-    if (!key) return;
+  const addNewKeyValue = (key: string, newValue: JsonValue) => {
+    if (value[key] !== undefined) {
+      return alert("Key already exists");
+    }
 
-    value[key] = null;
+    value[key] = newValue;
   };
 
   return (
@@ -87,12 +91,12 @@ export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
                     ),
                   },
                   {
-                    label: "Rename key",
+                    label: "Rename",
                     icon: <DriveFileRenameOutlineIcon />,
                     action: () => renameKey(key),
                   },
                   {
-                    label: "Delete key",
+                    label: "Delete",
                     icon: <DeleteIcon />,
                     action: () => removeObjectKey(value, key),
                   },
@@ -102,7 +106,23 @@ export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
           </Box>
         ))}
       </List>
-      <Button onClick={addKey}>Add key</Button>
+      <Popup
+        header={
+          <TextField
+            label="New key"
+            sx={{ m: 1 }}
+            value={newKey}
+            onChange={(e) => setNewKey(e.target.value)}
+          />
+        }
+        anchor={<Button>Add key</Button>}
+        actions={[
+          ...newCreateJsonValueActions((jsonType) => {
+            addNewKeyValue(newKey, getDefaultValueForType(jsonType)!);
+          }),
+        ]}
+        onClose={() => setNewKey("")}
+      />
     </Box>
   );
 }
