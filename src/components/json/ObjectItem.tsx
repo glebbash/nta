@@ -55,7 +55,7 @@ export function ObjectItem({ ctx, preview, value }: ObjectItemProps) {
           <Box key={key}>
             <Typography variant="subtitle1">{key}</Typography>
             <Stack direction="row">
-              <Box sx={{ flexGrow: 1 }}>
+              <Box sx={{ flexGrow: 1, overflow: "auto" }}>
                 <JsonItem
                   ctx={ctx}
                   preview={true}
