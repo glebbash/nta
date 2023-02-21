@@ -38,7 +38,7 @@ export function ArrayItem({ ctx, preview, value }: ArrayItemProps) {
         {value.map((subValue, index) => (
           <ListItem key={index} disablePadding sx={{ py: 1 }}>
             <Stack direction="row" sx={{ width: "100%" }}>
-              <Box sx={{ flexGrow: 1 }}>
+              <Box sx={{ flexGrow: 1, overflow: "auto" }}>
                 <JsonItem
                   ctx={ctx}
                   preview={true}
