@@ -13,6 +13,8 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import UndoIcon from "@mui/icons-material/Undo";
 import RedoIcon from "@mui/icons-material/Redo";
 import FolderIcon from "@mui/icons-material/Folder";
+import CodeIcon from "@mui/icons-material/Code";
+import * as syncedStore from "@syncedstore/core";
 
 import { JsonEditor } from "./JsonEditor";
 import { Popup } from "./Popup";
@@ -125,6 +127,27 @@ export function JsonScreen() {
                       }
 
                       replaceObjectContent(ctx.persistence.data!["~"], data);
+                    },
+                  },
+                  {
+                    label: "Run setup",
+                    icon: <CodeIcon />,
+                    action: async () => {
+                      const setupSource =
+                        ctx.persistence.data["~"].$setup?.toString();
+
+                      if (setupSource === undefined) {
+                        return;
+                      }
+
+                      const setupModule = await import(
+                        /* @vite-ignore */
+                        "data:text/javascript;base64," + btoa(setupSource)
+                      );
+
+                      if (typeof setupModule.setup === "function") {
+                        await setupModule.setup(ctx, { syncedStore });
+                      }
                     },
                   },
                 ]}
