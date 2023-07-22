@@ -1,6 +1,7 @@
 // place files you want to import through the `$lib` alias in this folder.
 
-export type Todo = {
+export type Note = {
     title: string;
-    completed: boolean;
+    content: string;
+    meta: Record<string, unknown>;
 }

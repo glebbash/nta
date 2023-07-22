@@ -1,20 +1,23 @@
-const { WebrtcProvider } = await import('y-webrtc');
-const { syncedStore, getYjsDoc } = await import('@syncedstore/core');
-const { svelteSyncedStore } = await import('@syncedstore/svelte');
+import { IndexeddbPersistence } from 'y-indexeddb'
+import { WebrtcProvider } from 'y-webrtc';
+import { syncedStore, getYjsDoc } from '@syncedstore/core';
+import { svelteSyncedStore } from '@syncedstore/svelte';
 
 import { browser } from '$app/environment';
-import type { Todo } from '$lib';
+import type { Note } from '$lib';
 
 export function getDataStore() {
-    const store = syncedStore({ todos: [] as Todo[] });
-    const svelteStore = svelteSyncedStore(store);
+    const roomName = 'syncedstore-todos-2';
+    const store = syncedStore({ notes: [] as Note[] });
+    const data = svelteSyncedStore(store);
 
     if (browser) {
         const doc = getYjsDoc(store);
-        new WebrtcProvider('syncedstore-todos-2', doc, {
+        new WebrtcProvider(roomName, doc, {
             signaling: ['wss://yjs-signaling.deno.dev/']
         });
+        new IndexeddbPersistence(roomName, doc);
     }
 
-    return { svelteStore, store };
+    return { data };
 }
