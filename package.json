@@ -35,5 +35,61 @@
 	},
 	"overrides": {
 		"@reactivedata/reactive": "0.2.2"
+	},
+	"prettier": {
+		"useTabs": true,
+		"singleQuote": true,
+		"trailingComma": "none",
+		"printWidth": 100,
+		"plugins": [
+			"prettier-plugin-svelte"
+		],
+		"pluginSearchDirs": [
+			"."
+		],
+		"overrides": [
+			{
+				"files": "*.svelte",
+				"options": {
+					"parser": "svelte"
+				}
+			}
+		]
+	},
+	"eslintConfig": {
+		"root": true,
+		"extends": [
+			"eslint:recommended",
+			"plugin:@typescript-eslint/recommended",
+			"plugin:svelte/recommended",
+			"prettier"
+		],
+		"parser": "@typescript-eslint/parser",
+		"plugins": [
+			"@typescript-eslint"
+		],
+		"parserOptions": {
+			"sourceType": "module",
+			"ecmaVersion": 2020,
+			"extraFileExtensions": [
+				".svelte"
+			]
+		},
+		"env": {
+			"browser": true,
+			"es2017": true,
+			"node": true
+		},
+		"overrides": [
+			{
+				"files": [
+					"*.svelte"
+				],
+				"parser": "svelte-eslint-parser",
+				"parserOptions": {
+					"parser": "@typescript-eslint/parser"
+				}
+			}
+		]
 	}
 }
