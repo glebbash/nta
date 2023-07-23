@@ -6,7 +6,7 @@ const BUILD_DIR = path.resolve(__dirname, "./www");
 export default async () => {
   const { svelte } = await import("@sveltejs/vite-plugin-svelte");
   return {
-    plugins: [svelte()],
+    plugins: [svelte({ configFile: "../svelte.config.mjs" })],
     root: SRC_DIR,
     base: "",
     publicDir: PUBLIC_DIR,
