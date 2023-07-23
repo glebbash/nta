@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { getDataStore } from '$lib/store';
   import CodeMirror from 'svelte-codemirror-editor';
   import { markdown } from '@codemirror/lang-markdown';
   import { githubDark } from '@uiw/codemirror-theme-github';
+
+  import { getDataStore } from '$lib/store';
+  import Collapsible from '../components/collapsible.svelte';
 
   const { data } = getDataStore();
 
@@ -39,40 +41,33 @@
   };
 </script>
 
-<div class="row">
-  <div class="col col-12" hidden={$data.uiState.noteOpen}>
-    <div class="paper container padding-small">
-      <details class="margin-small" bind:open={$data.uiState.nextActionsOpen}>
-        <summary style="user-select: none;">Next Actions</summary>
+<div>
+  <div hidden={$data.uiState.noteOpen}>
+    <div>
+      <details bind:open={$data.uiState.nextActionsOpen}>
+        <summary class="select-none">Next Actions</summary>
         <ul>
           {#each nextActions as note}
             <li>
               <a href="/" on:click|preventDefault={() => openNote(note.id)}>
                 {note.title}
               </a>
-              <button class="badge margin-left-small" on:click={() => (note.meta.list = 'inbox')}>
-                . . .
-              </button>
+              <button on:click={() => (note.meta.list = 'inbox')}> . . . </button>
             </li>
           {:else}
             Empty
           {/each}
         </ul>
       </details>
-      <details class="margin-small" bind:open={$data.uiState.inboxOpen}>
-        <summary style="user-select: none;">Inbox</summary>
+      <details bind:open={$data.uiState.inboxOpen}>
+        <summary class="select-none">Inbox</summary>
         <ul>
           {#each inbox as note}
             <li>
               <a href="/" on:click|preventDefault={() => openNote(note.id)}>
                 {note.title}
               </a>
-              <button
-                class="badge margin-left-small"
-                on:click={() => (note.meta.list = 'next actions')}
-              >
-                . . .
-              </button>
+              <button on:click={() => (note.meta.list = 'next actions')}> . . . </button>
             </li>
           {:else}
             Empty
@@ -80,35 +75,21 @@
         </ul>
       </details>
       <form on:submit|preventDefault={addToInbox}>
-        <input
-          class="margin-small"
-          autocomplete="off"
-          placeholder=". . ."
-          bind:value={inboxInput}
-        />
+        <input autocomplete="off" placeholder=". . ." bind:value={inboxInput} />
       </form>
-      <details class="margin-small">
-        <summary style="user-select: none;">Data</summary>
+      <Collapsible title="Data">
         <pre>{JSON.stringify($data, null, 2)}</pre>
-      </details>
+      </Collapsible>
     </div>
   </div>
-  <div class="col col-12" hidden={!$data.uiState.noteOpen}>
-    <div class="paper container padding-small">
-      <div class="row">
-        <button class="col col-2" on:click={closeNote}>&lt;</button>
-        <input class="col col-10" type="text" bind:value={currentNote.title} />
+  <div hidden={!$data.uiState.noteOpen}>
+    <div>
+      <div>
+        <button on:click={closeNote}>&lt;</button>
+        <input type="text" bind:value={currentNote.title} />
       </div>
-      <pre class="margin-bottom-small">{JSON.stringify(currentNote.meta)}</pre>
-      <div style="all:unset;">
-        <CodeMirror bind:value={currentNote.content} extensions={[markdown()]} theme={githubDark} />
-      </div>
+      <pre>{JSON.stringify(currentNote.meta)}</pre>
+      <CodeMirror bind:value={currentNote.content} extensions={[markdown()]} theme={githubDark} />
     </div>
   </div>
 </div>
-
-<style>
-  :global(html) {
-    background-color: black;
-  }
-</style>
