@@ -5,10 +5,13 @@ export const APP_DATA = {
   uiState: {} as {
     nextActionsOpen: boolean;
     inboxOpen: boolean;
-  } & Record<string, unknown>
+    noteOpen: boolean;
+    currentNoteId: string;
+  } & Record<string, unknown>,
 };
 
 export type Note = {
+  id: string;
   title: string;
   content: string;
   meta: Record<string, unknown>;

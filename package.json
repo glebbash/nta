@@ -30,8 +30,12 @@
   },
   "type": "module",
   "dependencies": {
+    "@codemirror/lang-markdown": "^6.2.0",
     "@syncedstore/core": "^0.5.2",
     "@syncedstore/svelte": "^0.5.2",
+    "@uiw/codemirror-theme-github": "^4.21.8",
+    "codemirror": "^6.0.1",
+    "svelte-codemirror-editor": "^1.1.0",
     "y-indexeddb": "^9.0.11",
     "y-webrtc": "^10.2.5"
   },
@@ -41,7 +45,7 @@
   "prettier": {
     "useTabs": false,
     "singleQuote": true,
-    "trailingComma": "none",
+    "trailingComma": "all",
     "printWidth": 100,
     "plugins": [
       "prettier-plugin-svelte"
