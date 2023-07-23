@@ -1,0 +1,18 @@
+{
+  "cwd": "/workspace/nta",
+  "type": [
+    "pwa"
+  ],
+  "name": "NTA",
+  "framework": "svelte",
+  "template": "single-view",
+  "bundler": "vite",
+  "cssPreProcessor": "less",
+  "theming": {
+    "customColor": true,
+    "color": "#ff8bb2",
+    "darkMode": false,
+    "iconFonts": true
+  },
+  "customBuild": false
+}

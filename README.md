@@ -1,38 +1,77 @@
-# create-svelte
+# NTA
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+## Framework7 CLI Options
 
-## Creating a project
+Framework7 app created with following options:
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
+```
+{
+  "cwd": "/workspace/nta",
+  "type": [
+    "pwa"
+  ],
+  "name": "NTA",
+  "framework": "svelte",
+  "template": "single-view",
+  "bundler": "vite",
+  "cssPreProcessor": "less",
+  "theming": {
+    "customColor": true,
+    "color": "#ff8bb2",
+    "darkMode": false,
+    "iconFonts": true
+  },
+  "customBuild": false
+}
 ```
 
-## Developing
+## Install Dependencies
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+First of all we need to install dependencies, run in terminal
+```
+npm install
 ```
 
-## Building
+## NPM Scripts
 
-To create a production version of your app:
+* 🔥 `start` - run development server
+* 🔧 `dev` - run development server
+* 🔧 `build` - build web app for production
 
-```bash
-npm run build
+## Vite
+
+There is a [Vite](https://vitejs.dev) bundler setup. It compiles and bundles all "front-end" resources. You should work only with files located in `/src` folder. Vite config located in `vite.config.js`.
+
+## PWA
+
+This is a PWA. Don't forget to check what is inside of your `service-worker.js`. It is also recommended that you disable service worker (or enable "Update on reload") in browser dev tools during development.
+## Assets
+
+Assets (icons, splash screens) source images located in `assets-src` folder. To generate your own icons and splash screen images, you will need to replace all assets in this directory with your own images (pay attention to image size and format), and run the following command in the project directory:
+
+```
+framework7 assets
 ```
 
-You can preview the production build with `npm run preview`.
+Or launch UI where you will be able to change icons and splash screens:
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+```
+framework7 assets --ui
+```
+
+
+
+## Documentation & Resources
+
+* [Framework7 Core Documentation](https://framework7.io/docs/)
+
+
+* [Framework7 Svelte Documentation](https://framework7.io/svelte/)
+* [Framework7 Icons Reference](https://framework7.io/icons/)
+* [Community Forum](https://forum.framework7.io)
+
+## Support Framework7
+
+Love Framework7? Support project by donating or pledging on:
+- Patreon: https://patreon.com/framework7
+- OpenCollective: https://opencollective.com/framework7
