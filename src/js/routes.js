@@ -1,9 +1,8 @@
-
-import HomePage from '../pages/home.svelte';
+import HomePage from "../pages/home.svelte";
 
 var routes = [
   {
-    path: '/',
+    path: "/",
     component: HomePage,
   },
 ];

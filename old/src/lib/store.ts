@@ -18,7 +18,7 @@ export function getDataStore() {
   const doc = getYjsDoc(store);
   const local = new IndexeddbPersistence(roomName, doc);
   const remote = new WebrtcProvider(roomName, doc, {
-    signaling: ['wss://yjs-signaling.deno.dev/']
+    signaling: ['wss://yjs-signaling.deno.dev/'],
   });
 
   let subscribers = 0;
@@ -37,7 +37,7 @@ export function getDataStore() {
         }
       };
     },
-  }
+  };
 
   return { data: customStore };
 }

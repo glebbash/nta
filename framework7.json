@@ -1,8 +1,6 @@
 {
   "cwd": "/workspace/nta",
-  "type": [
-    "pwa"
-  ],
+  "type": ["pwa"],
   "name": "NTA",
   "framework": "svelte",
   "template": "blank",
