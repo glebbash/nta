@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import {
     Page,
     Navbar,
@@ -8,6 +8,10 @@
     Toolbar,
     Block,
   } from "framework7-svelte";
+
+  import { getDataStore } from "../lib/store";
+
+  const { data } = getDataStore();
 </script>
 
 <Page name="home">

@@ -46,10 +46,7 @@
     "@reactivedata/reactive": "0.2.2"
   },
   "prettier": {
-    "useTabs": false,
-    "singleQuote": true,
     "trailingComma": "all",
-    "printWidth": 100,
     "plugins": [
       "prettier-plugin-svelte"
     ],

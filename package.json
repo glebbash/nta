@@ -10,7 +10,10 @@
     "dev": "cross-env NODE_ENV=development vite",
     "build": "cross-env NODE_ENV=production vite build && npx workbox generateSW workbox-config.js",
     "postinstall": "cpy --flat ./node_modules/framework7-icons/fonts/*.* ./src/fonts/ && cpy --flat ./node_modules/material-icons/iconfont/*.* ./src/fonts/",
-    "format": "prettier --write  --plugin prettier-plugin-svelte ."
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "prettier --plugin-search-dir . --check . && eslint .",
+    "format": "prettier --plugin-search-dir . --write ."
   },
   "browserslist": [
     "IOS >= 15",
@@ -19,6 +22,11 @@
     "last 5 Firefox versions"
   ],
   "dependencies": {
+    "@codemirror/lang-markdown": "^6.2.0",
+    "@syncedstore/core": "^0.5.2",
+    "@syncedstore/svelte": "^0.5.2",
+    "@uiw/codemirror-theme-github": "^4.21.8",
+    "codemirror": "^6.0.1",
     "dom7": "^4.0.6",
     "framework7": "^8.2.0",
     "framework7-icons": "^5.0.5",
@@ -26,22 +34,86 @@
     "material-icons": "^1.13.9",
     "skeleton-elements": "^4.0.1",
     "svelte": "^4.1.1",
-    "swiper": "^10.0.4"
+    "svelte-codemirror-editor": "^1.1.0",
+    "swiper": "^10.0.4",
+    "y-indexeddb": "^9.0.11",
+    "y-webrtc": "^10.2.5"
+  },
+  "overrides": {
+    "@reactivedata/reactive": "0.2.2"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.2",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "autoprefixer": "^10.4.14",
     "cpy-cli": "^5.0.0",
     "cross-env": "^7.0.3",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-svelte": "^2.30.0",
     "less": "^4.1.3",
+    "postcss": "^8.4.27",
     "postcss-preset-env": "^9.0.0",
     "prettier": "^3.0.0",
     "prettier-plugin-svelte": "^3.0.0",
+    "svelte-check": "^3.4.6",
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5.0.0",
     "vite": "^4.4.6",
     "workbox-cli": "^7.0.0"
   },
   "prettier": {
+    "trailingComma": "all",
     "plugins": [
       "prettier-plugin-svelte"
+    ],
+    "pluginSearchDirs": [
+      "."
+    ],
+    "overrides": [
+      {
+        "files": "*.svelte",
+        "options": {
+          "parser": "svelte"
+        }
+      }
+    ]
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:svelte/recommended",
+      "prettier"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "parserOptions": {
+      "sourceType": "module",
+      "ecmaVersion": 2020,
+      "extraFileExtensions": [
+        ".svelte"
+      ]
+    },
+    "env": {
+      "browser": true,
+      "es2017": true,
+      "node": true
+    },
+    "overrides": [
+      {
+        "files": [
+          "*.svelte"
+        ],
+        "parser": "svelte-eslint-parser",
+        "parserOptions": {
+          "parser": "@typescript-eslint/parser"
+        }
+      }
     ]
   }
 }
