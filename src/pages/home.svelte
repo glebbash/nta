@@ -1,3 +1,15 @@
+<script>
+  import {
+    Page,
+    Navbar,
+    NavTitle,
+    NavTitleLarge,
+    Link,
+    Toolbar,
+    Block,
+  } from "framework7-svelte";
+</script>
+
 <Page name="home">
   <!-- Top Navbar -->
   <Navbar large>
@@ -13,17 +25,4 @@
   <Block>
     <p>Here is your blank Framework7 app. Let's see what we have here.</p>
   </Block>
-
-
 </Page>
-<script>
-  import {
-    Page,
-    Navbar,
-    NavTitle,
-    NavTitleLarge,
-    Link,
-    Toolbar,
-    Block,
-  } from 'framework7-svelte';
-</script>

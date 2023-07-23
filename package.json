@@ -10,7 +10,7 @@
     "dev": "cross-env NODE_ENV=development vite",
     "build": "cross-env NODE_ENV=production vite build && npx workbox generateSW workbox-config.js",
     "postinstall": "cpy --flat ./node_modules/framework7-icons/fonts/*.* ./src/fonts/ && cpy --flat ./node_modules/material-icons/iconfont/*.* ./src/fonts/",
-    "lint": "prettier . --write"
+    "format": "prettier --write  --plugin prettier-plugin-svelte ."
   },
   "browserslist": [
     "IOS >= 15",
@@ -38,5 +38,10 @@
     "prettier-plugin-svelte": "^3.0.0",
     "vite": "^4.4.6",
     "workbox-cli": "^7.0.0"
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-svelte"
+    ]
   }
 }
