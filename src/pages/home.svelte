@@ -7,12 +7,19 @@
     Link,
     Toolbar,
     Block,
+    List,
+    ListItem,
+    AccordionContent,
+    ListInput,
   } from "framework7-svelte";
   import CodeMirror from "svelte-codemirror-editor";
   import { markdown } from "@codemirror/lang-markdown";
   import { githubDark } from "@uiw/codemirror-theme-github";
 
   import { getDataStore } from "../lib/store";
+
+  export let f7route: unknown;
+  export let f7router: unknown;
 
   const { data } = getDataStore();
 
@@ -69,46 +76,82 @@
     <div>
       <div hidden={$data.uiState.noteOpen}>
         <div>
-          <details bind:open={$data.uiState.nextActionsOpen}>
-            <summary class="select-none">Next Actions</summary>
-            <ul>
-              {#each nextActions as note}
-                <li>
-                  <a href="/" on:click|preventDefault={() => openNote(note.id)}>
-                    {note.title}
-                  </a>
-                  <button on:click={() => (note.meta.list = "inbox")}>
-                    . . .
-                  </button>
-                </li>
-              {:else}
-                Empty
-              {/each}
-            </ul>
-          </details>
-          <details bind:open={$data.uiState.inboxOpen}>
-            <summary class="select-none">Inbox</summary>
-            <ul>
-              {#each inbox as note}
-                <li>
-                  <a href="/" on:click|preventDefault={() => openNote(note.id)}>
-                    {note.title}
-                  </a>
-                  <button on:click={() => (note.meta.list = "next actions")}>
-                    . . .
-                  </button>
-                </li>
-              {:else}
-                Empty
-              {/each}
-            </ul>
-          </details>
+          <List accordionList accordionOpposite strong insetMd>
+            <ListItem
+              title="Next Actions"
+              accordionItem
+              accordionItemOpened={$data.uiState.nextActionsOpen}
+              on:accordionOpen={() => ($data.uiState.nextActionsOpen = true)}
+              on:accordionClose={() => ($data.uiState.nextActionsOpen = false)}
+            >
+              <AccordionContent>
+                <Block>
+                  <ul>
+                    {#each nextActions as note}
+                      <li>
+                        <a
+                          href="/"
+                          on:click|preventDefault={() => openNote(note.id)}
+                        >
+                          {note.title}
+                        </a>
+                        <button on:click={() => (note.meta.list = "inbox")}>
+                          . . .
+                        </button>
+                      </li>
+                    {:else}
+                      Empty
+                    {/each}
+                  </ul>
+                </Block>
+              </AccordionContent>
+            </ListItem>
+          </List>
+          <List accordionList accordionOpposite strong insetMd>
+            <ListItem
+              title="Inbox"
+              accordionItem
+              accordionItemOpened={$data.uiState.inboxOpen}
+              on:accordionOpen={() => ($data.uiState.inboxOpen = true)}
+              on:accordionClose={() => ($data.uiState.inboxOpen = false)}
+            >
+              <AccordionContent>
+                <Block>
+                  <ul>
+                    {#each inbox as note}
+                      <li>
+                        <a
+                          href="/"
+                          on:click|preventDefault={() => openNote(note.id)}
+                        >
+                          {note.title}
+                        </a>
+                        <button
+                          on:click={() => (note.meta.list = "next actions")}
+                        >
+                          . . .
+                        </button>
+                      </li>
+                    {:else}
+                      Empty
+                    {/each}
+                  </ul>
+                </Block>
+              </AccordionContent>
+            </ListItem>
+          </List>
+
           <form on:submit|preventDefault={addToInbox}>
-            <input
-              autocomplete="off"
-              placeholder=". . ."
-              bind:value={inboxInput}
-            />
+            <List>
+              <ListInput
+                outline
+                label="Add to inbox"
+                floatingLabel
+                type="text"
+                clearButton
+                bind:value={inboxInput}
+              />
+            </List>
           </form>
           <details>
             <summary class="select-none">Data</summary>
