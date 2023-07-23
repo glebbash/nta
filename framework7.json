@@ -5,12 +5,12 @@
   ],
   "name": "NTA",
   "framework": "svelte",
-  "template": "single-view",
+  "template": "blank",
   "bundler": "vite",
-  "cssPreProcessor": "less",
+  "cssPreProcessor": false,
   "theming": {
     "customColor": true,
-    "color": "#ff8bb2",
+    "color": "#ffadde",
     "darkMode": false,
     "iconFonts": true
   },
