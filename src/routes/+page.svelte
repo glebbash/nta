@@ -1,45 +1,49 @@
 <script lang="ts">
-	import { getDataStore } from '$lib/store';
+  import { getDataStore } from '$lib/store';
 
-	const { data } = getDataStore();
+  const { data } = getDataStore();
 
-	let newTodo = '';
+  $: nextActions = $data.notes.filter((node) => node.meta.list === 'next actions');
+  $: inbox = $data.notes.filter((note) => note.meta.list === 'inbox');
 
-	const addNote = () => {
-		const value = newTodo && newTodo.trim();
-		if (!value) {
-			return;
-		}
+  let inboxInput = '';
+  const addToInbox = () => {
+    const value = inboxInput && inboxInput.trim();
+    if (!value) {
+      return;
+    }
 
-		$data.notes.push({ title: value, content: '', meta: { list: 'inbox' } });
-		newTodo = '';
-	};
-
-	$: nextActions = $data.notes.filter((node) => node.meta.list === 'next actions');
-	$: inbox = $data.notes.filter((note) => note.meta.list === 'inbox');
+    $data.notes.push({ title: value, content: '', meta: { list: 'inbox' } });
+    inboxInput = '';
+  };
 </script>
 
 <main>
-	<h2>Next Actions</h2>
-	<ul>
-		{#each nextActions as note}
-			<li>
-				<a href="/" on:click|preventDefault={() => (note.meta.list = 'inbox')}>{note.title}</a><br
-				/>
-			</li>
-		{/each}
-	</ul>
-	<h2>Inbox</h2>
-	<ul>
-		{#each inbox as note}
-			<li>
-				<a href="/" on:click|preventDefault={() => (note.meta.list = 'next actions')}
-					>{note.title}</a
-				><br />
-			</li>
-		{/each}
-	</ul>
-	<form on:submit|preventDefault={addNote}>
-		<input autocomplete="off" placeholder="..." bind:value={newTodo} />
-	</form>
+  <details bind:open={$data.uiState.nextActionsOpen}>
+    <summary>Next Actions</summary>
+    <ul>
+      {#each nextActions as note}
+        <li>
+          <a href="/" on:click|preventDefault={() => (note.meta.list = 'inbox')}>{note.title}</a><br
+          />
+        </li>
+      {/each}
+    </ul>
+  </details>
+  <details bind:open={$data.uiState.inboxOpen}>
+    <summary>Inbox</summary>
+    <ul>
+      {#each inbox as note}
+        <li>
+          <a href="/" on:click|preventDefault={() => (note.meta.list = 'next actions')}
+            >{note.title}</a
+          ><br />
+        </li>
+      {/each}
+    </ul>
+  </details>
+  <form on:submit|preventDefault={addToInbox}>
+    <input autocomplete="off" placeholder="..." bind:value={inboxInput} />
+  </form>
+  <pre>{JSON.stringify($data, null, 2)}</pre>
 </main>
