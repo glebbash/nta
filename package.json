@@ -40,7 +40,8 @@
     "codemirror": "^6.0.1",
     "svelte-codemirror-editor": "^1.1.0",
     "y-indexeddb": "^9.0.11",
-    "y-webrtc": "^10.2.5"
+    "y-webrtc": "^10.2.5",
+    "yjs": "^13.6.7"
   },
   "overrides": {
     "@reactivedata/reactive": "0.2.2"
