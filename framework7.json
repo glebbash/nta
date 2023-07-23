@@ -7,10 +7,10 @@
   "framework": "svelte",
   "template": "blank",
   "bundler": "vite",
-  "cssPreProcessor": false,
+  "cssPreProcessor": "less",
   "theming": {
     "customColor": true,
-    "color": "#ffadde",
+    "color": "#fc91c6",
     "darkMode": false,
     "iconFonts": true
   },

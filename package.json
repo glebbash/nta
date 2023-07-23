@@ -26,5 +26,14 @@
     "skeleton-elements": "^4.0.1",
     "svelte": "^4.1.1",
     "swiper": "^10.0.4"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^2.4.2",
+    "cpy-cli": "^5.0.0",
+    "cross-env": "^7.0.3",
+    "less": "^4.1.3",
+    "postcss-preset-env": "^9.0.0",
+    "vite": "^4.4.6",
+    "workbox-cli": "^7.0.0"
   }
 }
