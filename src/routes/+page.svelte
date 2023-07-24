@@ -3,93 +3,93 @@
   import { markdown } from '@codemirror/lang-markdown';
   import { githubDark } from '@uiw/codemirror-theme-github';
 
+  import type { APP_DATA } from '$lib';
   import { getDataStore } from '$lib/store';
-  import Collapsible from '../components/collapsible.svelte';
+  import Collapsible from '../components/Collapsible.svelte';
+  import NoteList from '../components/NoteList.svelte';
 
   const { data } = getDataStore();
 
-  $: nextActions = $data.notes.filter((node) => node.meta.list === 'next actions');
-  $: inbox = $data.notes.filter((note) => note.meta.list === 'inbox');
+  $: notes = $data.notes;
+  $: uiState = ($data.uiState ?? {}) as (typeof APP_DATA)['uiState'];
+  $: nextActions = notes.filter((node) => node.meta.list === 'next actions');
+  $: inbox = notes.filter((note) => note.meta.list === 'inbox');
+  $: currentNote = notes.find((note) => note.id === uiState.currentNoteId) ?? {
+    title: '',
+    content: '',
+    meta: {},
+  };
 
-  let inboxInput = '';
-  const addToInbox = () => {
-    const value = inboxInput && inboxInput.trim();
+  let inboxNoteTitle = '';
+  const addInboxNote = () => {
+    const value = inboxNoteTitle && inboxNoteTitle.trim();
     if (!value) {
       return;
     }
 
-    $data.notes.push({
+    notes.push({
       id: crypto.randomUUID(),
       title: value,
       content: '',
       meta: { list: 'inbox' },
     });
-    inboxInput = '';
+    inboxNoteTitle = '';
   };
 
-  $: currentNote = $data.notes.find((note) => note.id === $data.uiState.currentNoteId) ?? {
-    title: '',
-    content: '',
-    meta: {},
-  };
   const openNote = (noteId: string) => {
-    $data.uiState.currentNoteId = noteId;
-    $data.uiState.noteOpen = true;
+    uiState.currentNoteId = noteId;
+    uiState.noteOpen = true;
   };
+
   const closeNote = () => {
-    $data.uiState.noteOpen = false;
+    uiState.noteOpen = false;
   };
 </script>
 
-<div>
-  <div hidden={$data.uiState.noteOpen}>
-    <div>
-      <details bind:open={$data.uiState.nextActionsOpen}>
-        <summary class="select-none">Next Actions</summary>
-        <ul>
-          {#each nextActions as note}
-            <li>
-              <a href="/" on:click|preventDefault={() => openNote(note.id)}>
-                {note.title}
-              </a>
-              <button on:click={() => (note.meta.list = 'inbox')}> . . . </button>
-            </li>
-          {:else}
-            Empty
-          {/each}
-        </ul>
-      </details>
-      <details bind:open={$data.uiState.inboxOpen}>
-        <summary class="select-none">Inbox</summary>
-        <ul>
-          {#each inbox as note}
-            <li>
-              <a href="/" on:click|preventDefault={() => openNote(note.id)}>
-                {note.title}
-              </a>
-              <button on:click={() => (note.meta.list = 'next actions')}> . . . </button>
-            </li>
-          {:else}
-            Empty
-          {/each}
-        </ul>
-      </details>
-      <form on:submit|preventDefault={addToInbox}>
-        <input autocomplete="off" placeholder=". . ." bind:value={inboxInput} />
-      </form>
-      <Collapsible title="Data">
-        <pre>{JSON.stringify($data, null, 2)}</pre>
+<div class="md:mx-28">
+  <div hidden={uiState.noteOpen}>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-1 p-1">
+      <Collapsible title="Next Actions" bind:open={uiState.nextActionsOpen}>
+        <NoteList
+          notes={nextActions}
+          on:open={(e) => openNote(e.detail.id)}
+          on:detailsClick={(e) => (e.detail.meta.list = 'inbox')}
+        />
       </Collapsible>
+      <Collapsible title="Inbox" bind:open={uiState.inboxOpen}>
+        <NoteList
+          notes={inbox}
+          on:open={(e) => openNote(e.detail.id)}
+          on:detailsClick={(e) => (e.detail.meta.list = 'next actions')}
+        />
+      </Collapsible>
+      <form on:submit|preventDefault={addInboxNote} class="col-span-2">
+        <input
+          class="border-2 border-black p-1 w-full"
+          autocomplete="off"
+          placeholder="Add to Inbox"
+          bind:value={inboxNoteTitle}
+        />
+      </form>
+      <div class="col-span-2">
+        <Collapsible title="Data" open={false}>
+          <CodeMirror
+            value={JSON.stringify($data, null, 2)}
+            theme={githubDark}
+            editable={false}
+            lineWrapping={true}
+          />
+        </Collapsible>
+      </div>
     </div>
   </div>
-  <div hidden={!$data.uiState.noteOpen}>
+
+  <div hidden={!uiState.noteOpen}>
     <div>
-      <div>
-        <button on:click={closeNote}>&lt;</button>
-        <input type="text" bind:value={currentNote.title} />
-      </div>
-      <pre>{JSON.stringify(currentNote.meta)}</pre>
-      <CodeMirror bind:value={currentNote.content} extensions={[markdown()]} theme={githubDark} />
+      <button on:click={closeNote}>&lt;</button>
+      <input class="border-2 border-black" type="text" bind:value={currentNote.title} />
     </div>
+    <pre>{JSON.stringify(currentNote.meta)}</pre>
+    <CodeMirror bind:value={currentNote.content} extensions={[markdown()]} theme={githubDark} />
   </div>
 </div>

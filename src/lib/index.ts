@@ -7,7 +7,7 @@ export const APP_DATA = {
     inboxOpen: boolean;
     noteOpen: boolean;
     currentNoteId: string;
-  } & Record<string, unknown>,
+  },
 };
 
 export type Note = {
