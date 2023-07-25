@@ -48,7 +48,7 @@
 
 <div class="md:mx-28">
   <div hidden={uiState.noteOpen}>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-1 p-1">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-1 p-1 items-start">
       <Collapsible title="Next Actions" bind:open={uiState.nextActionsOpen}>
         <NoteList
           notes={nextActions}
@@ -71,16 +71,6 @@
           bind:value={inboxNoteTitle}
         />
       </form>
-      <div class="col-span-2">
-        <Collapsible title="Data" open={false}>
-          <CodeMirror
-            value={JSON.stringify($data, null, 2)}
-            theme={githubDark}
-            editable={false}
-            lineWrapping={true}
-          />
-        </Collapsible>
-      </div>
     </div>
   </div>
 
