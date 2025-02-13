@@ -44,8 +44,13 @@ button:hover {
 
 .sidebar {
   background-color: var(--background-secondary);
-
   width: 25%;
+  transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 0;
+  overflow: hidden;
 }
 
 .sidebar .inbox {
@@ -98,7 +103,7 @@ button:hover {
 
 .dropdown {
   position: absolute;
-  top: 0;
+  bottom: 0;
   right: 0;
   display: inline-block;
   margin: 8px;
@@ -108,21 +113,12 @@ button:hover {
   display: none;
   position: absolute;
   background-color: var(--background-secondary);
-  min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
   right: 0;
-}
-
-.dropdown-content a {
-  color: var(--font-color);
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-.dropdown-content a:hover {
-  background-color: var(--highlight);
+  bottom: 100%;
+  padding: 8px;
+  border-radius: 8px;
 }
 
 .dropdown:hover .dropdown-content {
@@ -136,6 +132,33 @@ button:hover {
   padding: 64px;
 }
 
+.edit-area {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  transition: margin-left 0.3s ease;
+}
+
+#collapse-sidebar-button {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 8px;
+  z-index: 10;
+}
+
+#collapse-sidebar-button .close {
+  display: none;
+}
+
+#collapse-sidebar-button.collapsed .open {
+  display: none;
+}
+
+#collapse-sidebar-button.collapsed .close {
+  display: block;
+}
+
 .tiptap {
   padding: 16px;
   outline: none;
@@ -143,7 +166,7 @@ button:hover {
 
 /* fixes weird top margin */
 .tiptap :first-child {
-  margin-top: 0;
+  margin-bottom: 0;
 }
 
 /* List styles */
@@ -155,7 +178,7 @@ button:hover {
 
 .tiptap ul li p,
 .tiptap ol li p {
-  margin-top: 0.25em;
+  margin-bottom: 0.25em;
   margin-bottom: 0.25em;
 }
 

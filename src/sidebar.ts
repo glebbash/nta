@@ -10,19 +10,6 @@ export class Sidebar {
     this.files.observe(() => {
       this.render();
     });
-  }
-
-  render() {
-    this.element.innerHTML = `
-      <div class="inbox">
-        <div class="actions">
-          <span class="title">Inbox</span>
-          <button class="create">+</button>
-        </div>
-        <ul></ul>
-      </div>
-    `;
-    const list = this.element.querySelector("ul")!;
 
     this.element
       .querySelector("button.create")!
@@ -32,6 +19,11 @@ export class Sidebar {
           this.createFile(file);
         }
       });
+  }
+
+  render() {
+    const list = this.element.querySelector(".items")!;
+    list.innerHTML = "";
 
     for (const file of this.files) {
       const listItem = list.appendChild(document.createElement("li"));

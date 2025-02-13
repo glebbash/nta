@@ -61,6 +61,12 @@ document.querySelector(".delete")!.addEventListener("click", () => {
   }
 });
 
+const collapseButton = document.getElementById("collapse-sidebar-button")!;
+collapseButton.addEventListener("click", () => {
+  collapseButton.classList.toggle("collapsed");
+  document.getElementById("sidebar")!.classList.toggle("collapsed");
+});
+
 function loadFile(file: string) {
   if (editor) {
     editor.destroy();
