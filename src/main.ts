@@ -23,6 +23,7 @@ new IndexeddbPersistence("sidebar", sidebarDoc);
 
 const settings = new Settings(settingsDoc);
 settings.onNavigate = (file) => {
+  sidebar.displaySelected(file);
   loadFile(file);
 };
 
@@ -58,7 +59,7 @@ function loadFile(file: string) {
         },
       }),
       Color.configure({ types: [TextStyle.name, ListItem.name] }),
-      TextStyle.configure({ types: [ListItem.name] } as never),
+      TextStyle.configure({}),
       StarterKit.configure({ history: false, document: false }),
       Collaboration.configure({
         document: currentDoc,

@@ -2,7 +2,7 @@ import * as Y from "yjs";
 
 export class Sidebar {
   private files!: Y.Array<string>;
-
+  private selectedFile: string | null = null;
   public onFileSelected: (file: string) => void = () => {};
 
   constructor(private element: HTMLElement, private ydoc: Y.Doc) {
@@ -12,61 +12,119 @@ export class Sidebar {
     });
   }
 
-  createFile(filename: string) {
-    this.files.push([filename]);
-  }
-
-  deleteFile(index: number) {
-    this.files.delete(index, 1);
-  }
-
-  renameFile(index: number, newName: string) {
-    this.files.insert(index, [newName]);
-    this.files.delete(index + 1, 1);
-  }
-
   render() {
-    this.element.innerHTML = "";
+    this.element.innerHTML = `
+      <ul></ul>
+      <div class="actions">
+        <button class="create">+</button>
+        <button class="rename">R</button>
+        <button class="delete">X</button>
+      </div>
+    `;
+    const list = this.element.querySelector("ul")!;
 
-    const fileList = document.createElement("ul");
-    this.files.forEach((file, index) => {
-      const listItem = document.createElement("li");
-      listItem.textContent = file;
+    this.element
+      .querySelector("button.create")!
+      .addEventListener("click", () => {
+        const file = prompt("Enter name:");
+        if (file) {
+          this.createFile(file);
+        }
+      });
+
+    this.element
+      .querySelector("button.rename")!
+      .addEventListener("click", () => {
+        if (this.selectedFile === null) {
+          alert("No file selected");
+          return;
+        }
+
+        const newName = prompt("Enter new name:", this.selectedFile);
+        if (newName) {
+          this.renameFile(this.selectedFile, newName);
+        }
+      });
+
+    this.element
+      .querySelector("button.delete")!
+      .addEventListener("click", () => {
+        if (this.selectedFile === null) {
+          alert("No file selected");
+          return;
+        }
+
+        const confirmed = confirm(
+          `Are you sure you want to delete ${this.selectedFile}?`
+        );
+        if (confirmed) {
+          this.deleteFile(this.selectedFile);
+        }
+      });
+
+    for (const file of this.files) {
+      const listItem = list.appendChild(document.createElement("li"));
+      listItem.innerHTML = `
+        <span>${file}</span>
+      `;
+
+      if (file === this.selectedFile) {
+        listItem.classList.add("selected");
+      }
+
       listItem.addEventListener("click", () => {
         this.onFileSelected(file);
       });
+    }
+  }
 
-      const renameButton = document.createElement("button");
-      renameButton.textContent = "R";
-      renameButton.addEventListener("click", (event) => {
-        event.stopPropagation(); // Prevent file selection
-        const newName = prompt("Enter new name:", file);
-        if (newName) {
-          this.renameFile(index, newName);
-        }
-      });
-      listItem.appendChild(renameButton);
+  displaySelected(selected: string) {
+    this.selectedFile = selected;
+    this.render();
+  }
 
-      const deleteButton = document.createElement("button");
-      deleteButton.textContent = "X";
-      deleteButton.addEventListener("click", (event) => {
-        event.stopPropagation(); // Prevent file selection
-        this.deleteFile(index);
-      });
-      listItem.appendChild(deleteButton);
+  createFile(newFile: string) {
+    if (this.findFileIndex(newFile) !== null) {
+      alert(`File ${newFile} already exists`);
+      return;
+    }
 
-      fileList.appendChild(listItem);
-    });
-    this.element.appendChild(fileList);
+    this.files.push([newFile]);
+  }
 
-    const createButton = document.createElement("button");
-    createButton.textContent = "+";
-    createButton.addEventListener("click", () => {
-      const filename = prompt("Enter filename:");
-      if (filename) {
-        this.createFile(filename);
+  deleteFile(file: string) {
+    const index = this.findFileIndex(file);
+    if (index === null) {
+      alert(`File ${file} not found`);
+      return;
+    }
+
+    this.files.delete(index, 1);
+  }
+
+  renameFile(oldFile: string, newFile: string) {
+    const index = this.findFileIndex(oldFile);
+    if (index === null) {
+      alert(`File ${oldFile} not found`);
+      return;
+    }
+
+    if (this.findFileIndex(newFile) !== null) {
+      alert(`File ${newFile} already exists`);
+      return;
+    }
+
+    this.files.insert(index, [newFile]);
+    this.files.delete(index + 1, 1);
+  }
+
+  private findFileIndex(file: string) {
+    for (let index = 0; index < this.files.length; index++) {
+      if (this.files.get(index) === file) {
+        return index;
       }
-    });
-    this.element.appendChild(createButton);
+    }
+
+    return null;
   }
 }

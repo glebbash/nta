@@ -19,69 +19,53 @@ body {
   font-family: "Noto Sans", sans-serif;
 }
 
-#sidebar {
-  width: 200px; /* Adjust the width as needed */
-  background-color: #f0f0f0; /* Add a background color for visibility */
-  padding: 10px;
+.sidebar {
+  width: 200px;
+  background-color: #f0f0f0;
   margin: 8px;
 }
 
-#sidebar ul {
+.sidebar ul {
   list-style-type: none;
   padding: 0;
+  margin: 0;
 }
 
-#sidebar li {
+.sidebar li {
   cursor: pointer;
   padding: 8px 12px;
   border-bottom: 1px solid #ddd;
   transition: background-color 0.3s ease;
 }
 
-#sidebar li:last-child {
-  border-bottom: none;
+.sidebar li:hover {
+  background-color: rgba(0, 0, 0, 0.262);
 }
 
-#sidebar li:hover {
-  background-color: #eee;
+.sidebar li.selected {
+  font-weight: bold;
 }
 
-#sidebar button {
-  background-color: #f44336; /* Red */
-  color: white;
+.sidebar button {
   padding: 5px 8px;
-  margin-left: 5px;
-  border: none;
-  border-radius: 4px;
+  border: 1px solid black;
+  border-radius: 40px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-#sidebar button:hover {
-  background-color: #da190b;
+.sidebar button:hover {
+  background-color: rgba(10, 7, 7, 0.216);
 }
 
-#sidebar button.rename {
-  background-color: #4caf50; /* Green */
+.sidebar button.delete:hover {
+  background-color: rgba(255, 0, 0, 0.788);
 }
 
-#sidebar button.rename:hover {
-  background-color: #367c39;
-}
-
-#sidebar button.create {
-  background-color: #008cba; /* Blue */
-  color: white;
+.sidebar .actions {
+  display: flex;
+  justify-content: space-between;
   padding: 8px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: 10px;
-}
-
-#sidebar button.create:hover {
-  background-color: #005f75;
 }
 
 /* editor styling */
