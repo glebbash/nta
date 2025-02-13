@@ -35,6 +35,32 @@ sidebar.onFileSelected = (file) => {
   settings.navigateTo(file);
 };
 
+document.querySelector(".rename")!.addEventListener("click", () => {
+  const currentFile = settings.getCurrentFile();
+  if (currentFile === null) {
+    alert("No file selected");
+    return;
+  }
+
+  const newName = prompt("Enter new name:", currentFile);
+  if (newName) {
+    sidebar.renameFile(currentFile, newName);
+  }
+});
+
+document.querySelector(".delete")!.addEventListener("click", () => {
+  const currentFile = settings.getCurrentFile();
+  if (currentFile === null) {
+    alert("No file selected");
+    return;
+  }
+
+  const confirmed = confirm(`Are you sure you want to delete ${currentFile}?`);
+  if (confirmed) {
+    sidebar.deleteFile(currentFile);
+  }
+});
+
 function loadFile(file: string) {
   if (editor) {
     editor.destroy();

@@ -18,8 +18,6 @@ export class Sidebar {
         <div class="actions">
           <span class="title">Inbox</span>
           <button class="create">+</button>
-          <button class="rename">R</button>
-          <button class="delete">X</button>
         </div>
         <ul></ul>
       </div>
@@ -32,36 +30,6 @@ export class Sidebar {
         const file = prompt("Enter name:");
         if (file) {
           this.createFile(file);
-        }
-      });
-
-    this.element
-      .querySelector("button.rename")!
-      .addEventListener("click", () => {
-        if (this.selectedFile === null) {
-          alert("No file selected");
-          return;
-        }
-
-        const newName = prompt("Enter new name:", this.selectedFile);
-        if (newName) {
-          this.renameFile(this.selectedFile, newName);
-        }
-      });
-
-    this.element
-      .querySelector("button.delete")!
-      .addEventListener("click", () => {
-        if (this.selectedFile === null) {
-          alert("No file selected");
-          return;
-        }
-
-        const confirmed = confirm(
-          `Are you sure you want to delete ${this.selectedFile}?`
-        );
-        if (confirmed) {
-          this.deleteFile(this.selectedFile);
         }
       });
 

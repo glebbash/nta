@@ -7,7 +7,17 @@
   </head>
   <body>
     <div id="sidebar" class="sidebar">sidebar</div>
-    <div id="editor"></div>
+    <div id="edit-area" class="edit-area">
+      <div class="dropdown">
+        <button>...</button>
+        <div class="dropdown-content">
+          <button class="rename">Rename</button>
+          <br />
+          <button class="delete">Delete</button>
+        </div>
+      </div>
+      <div id="editor"></div>
+    </div>
     <script type="module" src="./src/main.ts"></script>
   </body>
 </html>
