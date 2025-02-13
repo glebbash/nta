@@ -14,11 +14,14 @@ export class Sidebar {
 
   render() {
     this.element.innerHTML = `
-      <ul></ul>
-      <div class="actions">
-        <button class="create">+</button>
-        <button class="rename">R</button>
-        <button class="delete">X</button>
+      <div class="inbox">
+        <div class="actions">
+          <span class="title">Inbox</span>
+          <button class="create">+</button>
+          <button class="rename">R</button>
+          <button class="delete">X</button>
+        </div>
+        <ul></ul>
       </div>
     `;
     const list = this.element.querySelector("ul")!;

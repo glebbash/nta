@@ -1,17 +1,21 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Sans+Mono:wght@400;700&display=swap");
 
 :root {
-  --purple-light: #e0c3fc;
-  --black: #000000;
-  --white: #ffffff;
-  --gray-2: #cccccc;
-  --gray-3: #999999;
+  --background: #171717;
+  --background-secondary: #232323;
+  --font-color: #f8f8f8;
+  --font-color-secondary: #b6b6b6;
+  --highlight: #ffffff41;
+  --highlight-danger: #ff0000c9;
 }
 
 /* sidebar styling */
 
 html,
 body {
+  color: var(--font-color);
+  background-color: var(--background);
+
   display: flex;
   width: 100vw;
   height: 100vh;
@@ -20,9 +24,27 @@ body {
 }
 
 .sidebar {
+  background-color: var(--background-secondary);
+
   width: 200px;
-  background-color: #f0f0f0;
+}
+
+.sidebar .inbox {
+  background-color: var(--background);
+
   margin: 8px;
+  border-radius: 8px;
+  padding-bottom: 10px;
+}
+
+.sidebar .inbox .title {
+  font-weight: bold;
+}
+
+.sidebar .inbox .actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
 }
 
 .sidebar ul {
@@ -32,14 +54,16 @@ body {
 }
 
 .sidebar li {
+  margin: 0 8px;
+  border-radius: 6px;
+  padding: 2px 6px;
+
   cursor: pointer;
-  padding: 8px 12px;
-  border-bottom: 1px solid #ddd;
   transition: background-color 0.3s ease;
 }
 
 .sidebar li:hover {
-  background-color: rgba(0, 0, 0, 0.262);
+  background-color: var(--highlight);
 }
 
 .sidebar li.selected {
@@ -47,31 +71,29 @@ body {
 }
 
 .sidebar button {
-  padding: 5px 8px;
-  border: 1px solid black;
-  border-radius: 40px;
+  background-color: transparent;
+  color: var(--font-color-secondary);
+
+  padding: 4px 8px;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .sidebar button:hover {
-  background-color: rgba(10, 7, 7, 0.216);
+  background-color: var(--highlight);
 }
 
 .sidebar button.delete:hover {
-  background-color: rgba(255, 0, 0, 0.788);
-}
-
-.sidebar .actions {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 12px;
+  background-color: var(--highlight-danger);
 }
 
 /* editor styling */
 
 #editor {
   flex-grow: 1;
+  padding: 64px;
 }
 
 .tiptap {
