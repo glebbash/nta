@@ -20,29 +20,6 @@ let currentDoc: Y.Doc | undefined;
 await main();
 
 async function main() {
-  if (isMobile()) {
-    // fix for chrome android
-    window.addEventListener("resize", () => {
-      window.scrollTo(0, 0);
-    });
-
-    setupOverKeyboardBar(document.querySelector(".over-keyboard-bar")!);
-    document.querySelector("#tab-btn")!.addEventListener("click", () => {
-      if (editor === undefined) {
-        return;
-      }
-
-      editor.chain().focus().sinkListItem("listItem").run();
-    });
-    document.querySelector("#untab-btn")!.addEventListener("click", () => {
-      if (editor === undefined) {
-        return;
-      }
-
-      editor.chain().focus().liftListItem("listItem").run();
-    });
-  }
-
   const settingsDoc = new Y.Doc();
   localSync.syncDoc(settingsDoc, "settings");
 
@@ -55,12 +32,22 @@ async function main() {
   const fileSystemDoc = new Y.Doc();
   localSync.syncDoc(fileSystemDoc, "filesystem");
 
+  const collapseButton = document.getElementById("collapse-sidebar-button")!;
+  collapseButton.addEventListener("click", () => {
+    collapseButton.classList.toggle("collapsed");
+    document.getElementById("sidebar")!.classList.toggle("collapsed");
+  });
+
   const sidebar = new Sidebar(
     document.querySelector<HTMLElement>("#sidebar")!,
     fileSystemDoc
   );
   sidebar.onFileSelected = (file) => {
     settings.navigateTo(file);
+    if (isMobile()) {
+      collapseButton.classList.add("collapsed");
+      document.getElementById("sidebar")!.classList.add("collapsed");
+    }
   };
 
   document.querySelector(".rename")!.addEventListener("click", () => {
@@ -91,11 +78,42 @@ async function main() {
     }
   });
 
-  const collapseButton = document.getElementById("collapse-sidebar-button")!;
-  collapseButton.addEventListener("click", () => {
-    collapseButton.classList.toggle("collapsed");
-    document.getElementById("sidebar")!.classList.toggle("collapsed");
-  });
+  if (isMobile()) {
+    // fix for chrome android
+    window.addEventListener("resize", () => {
+      window.scrollTo(0, 0);
+    });
+
+    setupOverKeyboardBar(document.querySelector(".over-keyboard-bar")!);
+    document.querySelector("#tab-btn")!.addEventListener("click", () => {
+      if (editor === undefined) {
+        return;
+      }
+
+      editor.chain().focus().sinkListItem("listItem").run();
+    });
+    document.querySelector("#untab-btn")!.addEventListener("click", () => {
+      if (editor === undefined) {
+        return;
+      }
+
+      editor.chain().focus().liftListItem("listItem").run();
+    });
+    document.querySelector("#undo-btn")!.addEventListener("click", () => {
+      if (editor === undefined) {
+        return;
+      }
+
+      editor.chain().focus().undo().run();
+    });
+    document.querySelector("#redo-btn")!.addEventListener("click", () => {
+      if (editor === undefined) {
+        return;
+      }
+
+      editor.chain().focus().redo().run();
+    });
+  }
 }
 
 async function loadFile(file: string) {
