@@ -8,7 +8,7 @@ import Document from "@tiptap/extension-document";
 import Placeholder from "@tiptap/extension-placeholder";
 import * as Y from "yjs";
 
-import "./style.css";
+import "./styles/_all.css";
 import { Sidebar } from "./sidebar.ts";
 import { Settings } from "./settings.ts";
 import { LocalSync } from "./local-sync.ts";
@@ -168,5 +168,10 @@ function setupOverKeyboardBar(bar: HTMLElement) {
 }
 
 function isMobile() {
-  return window.innerWidth < 768;
+  return (
+    window.innerWidth < 768 &&
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    )
+  );
 }

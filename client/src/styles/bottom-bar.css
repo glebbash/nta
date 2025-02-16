@@ -1,0 +1,60 @@
+.bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .bottom-bar {
+    background-color: var(--background-secondary);
+  }
+}
+
+.collapse-sidebar-button {
+  margin: 8px;
+  z-index: 10;
+}
+
+.collapse-sidebar-button .close {
+  display: none;
+}
+
+.collapse-sidebar-button.collapsed .open {
+  display: none;
+}
+
+.collapse-sidebar-button.collapsed .close {
+  display: block;
+}
+
+/* dotdotdot menu */
+
+.dotdotdot-button {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: inline-block;
+  margin: 8px;
+  z-index: 1000;
+}
+
+.dotdotdot-content {
+  display: none;
+  position: absolute;
+  background-color: var(--background-secondary);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  right: 0;
+  bottom: 100%;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.dotdotdot-button:hover .dotdotdot-content {
+  display: block;
+}
+
+.dotdotdot-button button {
+  font-size: 16px;
+}

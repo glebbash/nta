@@ -1,0 +1,64 @@
+.sidebar {
+  background-color: var(--background-secondary);
+  width: 25%;
+  min-width: 25%;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 80%;
+    min-width: 80%;
+  }
+}
+
+.sidebar.collapsed {
+  min-width: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.sidebar .inbox {
+  background-color: var(--background);
+
+  margin: 8px;
+  border-radius: 8px;
+  padding-bottom: 10px;
+}
+
+.sidebar .inbox .title {
+  font-weight: bold;
+}
+
+.sidebar .inbox .actions {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin: 0 8px;
+  border-radius: 6px;
+  padding: 2px 6px;
+
+  cursor: pointer;
+}
+
+.sidebar li:hover {
+  background-color: var(--highlight);
+}
+
+.sidebar li.selected {
+  font-weight: bold;
+}
+
+.sidebar button.delete:hover {
+  background-color: var(--highlight-danger);
+}

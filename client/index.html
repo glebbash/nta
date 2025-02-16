@@ -11,14 +11,6 @@
     />
   </head>
   <body>
-    <button id="collapse-sidebar-button">
-      <div class="open">
-        <span class="material-symbols-outlined">left_panel_close</span>
-      </div>
-      <div class="close">
-        <span class="material-symbols-outlined">left_panel_open</span>
-      </div>
-    </button>
     <div id="sidebar" class="sidebar">
       <div class="inbox">
         <div class="actions">
@@ -31,17 +23,27 @@
       </div>
     </div>
     <div id="edit-area" class="edit-area">
-      <div class="dropdown">
+      <div id="editor"></div>
+    </div>
+    <div class="bottom-bar">
+      <button id="collapse-sidebar-button" class="collapse-sidebar-button">
+        <div class="open">
+          <span class="material-symbols-outlined">left_panel_close</span>
+        </div>
+        <div class="close">
+          <span class="material-symbols-outlined">left_panel_open</span>
+        </div>
+      </button>
+      <div class="dotdotdot-button">
         <button>
           <span class="material-symbols-outlined">more_horiz</span>
         </button>
-        <div class="dropdown-content">
+        <div class="dotdotdot-content">
           <button class="rename">Rename</button>
           <br />
           <button class="delete">Delete</button>
         </div>
       </div>
-      <div id="editor"></div>
     </div>
     <div class="over-keyboard-bar">
       <button id="tab-btn" class="okb-btn">*&gt;</button>
