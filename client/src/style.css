@@ -4,7 +4,7 @@
   --background: #171717;
   --background-secondary: #232323;
   --font-color: #f8f8f8;
-  --font-color-secondary: #b6b6b6;
+  --font-color-secondary: #9b9b9b;
   --highlight: #ffffff41;
   --highlight-danger: #ff0000c9;
 }
@@ -99,6 +99,30 @@ button:hover {
   background-color: var(--highlight-danger);
 }
 
+/* over keyboard bar */
+html {
+  overflow: hidden;
+}
+.over-keyboard-bar {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  display: none;
+  z-index: 1000;
+}
+.over-keyboard-bar {
+  background: black;
+  font-size: 18px;
+}
+.indent-btn {
+  font-weight: bold;
+  background-color: pink;
+  margin: 0;
+  border: none;
+  padding: 8px 16px;
+  font-size: 16px;
+}
+
 /* dropdown */
 
 .dropdown {
@@ -183,6 +207,11 @@ button:hover {
 }
 
 /* Heading styles */
+
+.tiptap h1:first-child {
+  margin-top: 0;
+}
+
 .tiptap h1,
 .tiptap h2,
 .tiptap h3,
@@ -256,7 +285,7 @@ button:hover {
 }
 
 .tiptap .is-empty::before {
-  color: var(--gray-3);
+  color: var(--font-color-secondary);
   content: attr(data-placeholder);
   float: left;
   height: 0;

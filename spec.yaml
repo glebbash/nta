@@ -1,0 +1,88 @@
+- DB:
+    - local for each client
+    - uses sqlite
+
+    - tables:
+        - _doc_updates:
+            - (primary key): document_id, update_id
+            - document_id (uuid)
+            - update_id (uuid)
+            - update (encoded yjs update)
+
+        - _doc_metadata:
+            - (primary key): document_id
+            - document_id (uuid)
+            - document_type (optional)
+            - metadata (json)
+
+        - "document type":
+            - (primary key): document id
+            - <some schema>
+
+- local sync provider:
+    - listens to changes on all loaded documents
+
+    - on document update:
+        - inserts the update into `documents`.`updates` field
+        - appends the document id to the meta-update queue,
+          starting the `meta-update debounce timer` from the beginning
+
+    - on `meta-update debounce timer` trigger:
+        - for each document in the queue:
+            - creates a document from joined `_doc_updates` by id
+            - extracts the metadata from the document
+            - updates `_doc_metadata` with the metadata
+
+            - if the document has non-null document type:
+                - it's also stored in a table named after the document type
+                  with its fields as proper columns (not just json)
+
+- remote sync provider:
+    - listens to changes on all loaded documents
+
+    - on document update:
+        - sends the update to the server
+
+        - if the client is offline:
+            - stores the updated document id and its last update-id in the `offline updates` set
+
+    - when client goes online:
+        - for each document in the `offline updates` set:
+            - loads all updates from `_doc_updates`
+              where document_id = document_id and update_id > last_update_id
+            - merges these updates into one
+            - sends the merged update to the server
+
+        - requests a sync check from the server:
+            - sends a list of known document IDs
+            - receives a list of outdated/missing documents from the server's `updates set`
+            - fetches missing updates or compacted states
+            - applies received updates and acknowledges them
+
+    - on server update:
+        - if the document is loaded:
+            - then:
+                - applies the update to the document
+                  (which will trigger the `local sync provider` to store the update)
+            - else:
+                - calls `local sync provider` to store the update
+
+- sync server:
+    - maintains an `updates set` for each client:
+        - tracks documents that each client needs to receive
+        - when a new client connects:
+            - creates an `updates set` containing all document IDs on the server
+            - starts sending compacted states for these documents
+            - removes each document from the set upon client acknowledgment
+
+    - when update is received:
+        - adds the document ID to the `updates set` of all known clients
+        - broadcasts the update to all other connected clients
+        - stores the update in its own `_doc_updates` table
+        - starts `backup debounce timer` from the beginning
+
+    - on client acknowledgment:
+        - removes the document ID from the client's `updates set`
+
+    - on `backup debounce timer` trigger:
+        - saves the database to S3-like storage
