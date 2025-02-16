@@ -108,7 +108,7 @@ button:hover {
 
 /* over keyboard bar */
 html {
-  overflow: hidden;
+  overflow: clip;
 }
 .over-keyboard-bar {
   position: fixed;
@@ -138,6 +138,7 @@ html {
   right: 0;
   display: inline-block;
   margin: 8px;
+  z-index: 1000;
 }
 
 .dropdown-content {
@@ -167,6 +168,14 @@ html {
   padding: 64px;
   overflow: auto;
   white-space: pre-wrap;
+  scrollbar-color: var(--background-secondary) var(--background);
+}
+
+@media (max-width: 768px) {
+  #editor {
+    padding: 16px;
+    padding-bottom: 80px;
+  }
 }
 
 .edit-area {
@@ -222,7 +231,7 @@ html {
 
 /* Heading styles */
 
-.tiptap h1:first-child {
+.tiptap :first-child {
   margin-top: 0;
 }
 

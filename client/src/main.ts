@@ -20,21 +20,28 @@ let currentDoc: Y.Doc | undefined;
 await main();
 
 async function main() {
-  setupOverKeyboardBar(document.querySelector(".over-keyboard-bar")!);
-  document.querySelector("#tab-btn")!.addEventListener("click", () => {
-    if (editor === undefined) {
-      return;
-    }
+  if (isMobile()) {
+    // fix for chrome android
+    window.addEventListener("resize", () => {
+      window.scrollTo(0, 0);
+    });
 
-    editor.chain().focus().sinkListItem("listItem").run();
-  });
-  document.querySelector("#untab-btn")!.addEventListener("click", () => {
-    if (editor === undefined) {
-      return;
-    }
+    setupOverKeyboardBar(document.querySelector(".over-keyboard-bar")!);
+    document.querySelector("#tab-btn")!.addEventListener("click", () => {
+      if (editor === undefined) {
+        return;
+      }
 
-    editor.chain().focus().liftListItem("listItem").run();
-  });
+      editor.chain().focus().sinkListItem("listItem").run();
+    });
+    document.querySelector("#untab-btn")!.addEventListener("click", () => {
+      if (editor === undefined) {
+        return;
+      }
+
+      editor.chain().focus().liftListItem("listItem").run();
+    });
+  }
 
   const settingsDoc = new Y.Doc();
   localSync.syncDoc(settingsDoc, "settings");
@@ -140,4 +147,8 @@ function setupOverKeyboardBar(bar: HTMLElement) {
       (window.visualViewport!.offsetTop + window.visualViewport!.height) +
       "px";
   }
+}
+
+function isMobile() {
+  return window.innerWidth < 768;
 }
