@@ -30,20 +30,22 @@ export class LocalSync {
         return;
       }
 
+      const beginTime = Date.now();
       const state = Y.encodeStateAsUpdate(doc);
       await this.storeDocumentState(id, state);
 
       if (this.debug) {
-        console.log(`doc ${id} stored`);
+        console.log(`doc ${id} stored in ${Date.now() - beginTime}ms`);
       }
     });
 
+    const beginTime = Date.now();
     const state = await this.loadDocumentState(id);
     if (state !== undefined) {
       Y.applyUpdate(doc, state, this);
 
       if (this.debug) {
-        console.log(`doc ${id} loaded`);
+        console.log(`doc ${id} loaded in ${Date.now() - beginTime}ms`);
       }
     }
   }

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "postinstall": "cd client && npm install",
-    "dev": "cd client && vite",
+    "dev": "cd client && vite --host",
     "build": "cd client && tsc && vite build"
   },
   "devDependencies": {

@@ -9,8 +9,6 @@
   --highlight-danger: #ff0000c9;
 }
 
-/* sidebar styling */
-
 html,
 body {
   color: var(--font-color);
@@ -45,10 +43,19 @@ button:hover {
 .sidebar {
   background-color: var(--background-secondary);
   width: 25%;
-  transition: width 0.3s ease;
+  min-width: 25%;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 80%;
+    min-width: 80%;
+  }
 }
 
 .sidebar.collapsed {
+  min-width: 0;
   width: 0;
   overflow: hidden;
 }
@@ -149,11 +156,17 @@ html {
   display: block;
 }
 
+.dropdown button {
+  font-size: 16px;
+}
+
 /* editor */
 
 #editor {
   flex-grow: 1;
   padding: 64px;
+  overflow: auto;
+  white-space: pre-wrap;
 }
 
 .edit-area {
@@ -161,6 +174,7 @@ html {
   flex-direction: column;
   flex-grow: 1;
   transition: margin-left 0.3s ease;
+  overflow-x: hidden;
 }
 
 #collapse-sidebar-button {
