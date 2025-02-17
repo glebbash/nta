@@ -8,12 +8,14 @@ import Document from "@tiptap/extension-document";
 import Placeholder from "@tiptap/extension-placeholder";
 import * as Y from "yjs";
 
-import "./styles/_all.css";
 import { Sidebar } from "./sidebar.ts";
 import { Settings } from "./settings.ts";
 import { LocalSync } from "./local-sync.ts";
 
+const hideLoading = showLoading();
 const localSync = await LocalSync.load("nta-2");
+hideLoading();
+
 let editor: Editor | undefined;
 let currentDoc: Y.Doc | undefined;
 
@@ -32,10 +34,23 @@ async function main() {
   const fileSystemDoc = new Y.Doc();
   localSync.syncDoc(fileSystemDoc, "filesystem");
 
+  const uiState = settingsDoc.getMap("uiState");
+
   const collapseButton = document.getElementById("collapse-sidebar-button")!;
   collapseButton.addEventListener("click", () => {
-    collapseButton.classList.toggle("collapsed");
-    document.getElementById("sidebar")!.classList.toggle("collapsed");
+    uiState.set("sidebarCollapsed", !uiState.get("sidebarCollapsed"));
+  });
+
+  uiState.observe(() => {
+    const collapsed = uiState.get("sidebarCollapsed") ?? false;
+    const sidebar = document.getElementById("sidebar")!;
+    if (collapsed) {
+      collapseButton.classList.add("collapsed");
+      sidebar.classList.add("collapsed");
+    } else {
+      collapseButton.classList.remove("collapsed");
+      sidebar.classList.remove("collapsed");
+    }
   });
 
   const sidebar = new Sidebar(
@@ -174,4 +189,38 @@ function isMobile() {
       navigator.userAgent
     )
   );
+}
+
+function showLoading() {
+  const loading = document.body.appendChild(document.createElement("div"));
+  loading.style.position = "fixed";
+  loading.style.top = "50%";
+  loading.style.left = "50%";
+  loading.style.transform = "translate(-50%, -50%)";
+  loading.style.fontSize = "24px";
+  loading.style.color = "var(--font-color)";
+
+  let loaded = false;
+
+  {
+    const timerElement = loading.appendChild(document.createElement("span"));
+
+    const start = Date.now();
+    function updateTimer() {
+      const millis = Date.now() - start;
+      const seconds = (millis / 1000).toFixed(2);
+      timerElement.textContent = `(${seconds}s) Loading ...`;
+
+      if (!loaded) {
+        requestAnimationFrame(updateTimer);
+      }
+    }
+
+    updateTimer();
+  }
+
+  return () => {
+    loaded = true;
+    document.body.removeChild(loading);
+  };
 }
