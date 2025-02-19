@@ -62,3 +62,7 @@
 .sidebar button.delete:hover {
   background-color: var(--highlight-danger);
 }
+
+.no-transition {
+  transition: none;
+}

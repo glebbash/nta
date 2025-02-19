@@ -8,90 +8,104 @@ import Document from "@tiptap/extension-document";
 import Placeholder from "@tiptap/extension-placeholder";
 import * as Y from "yjs";
 
-import { Sidebar } from "./sidebar.ts";
-import { Settings } from "./settings.ts";
-import { LocalSync } from "./local-sync.ts";
+import { DocumentStore } from "./document-store.js";
 
-const hideLoading = showLoading();
-const localSync = await LocalSync.load("nta-2");
-hideLoading();
+type NoteEntry = Y.Map<unknown>;
+
+const TIPTAP_DOC_SCHEMA = Document.extend({
+  content: "heading block*",
+});
 
 let editor: Editor | undefined;
+let currentNoteId: string | undefined;
 let currentDoc: Y.Doc | undefined;
 
 await main();
 
 async function main() {
-  const settingsDoc = new Y.Doc();
-  localSync.syncDoc(settingsDoc, "settings");
+  const documents = await DocumentStore.load("nta");
 
-  const settings = new Settings(settingsDoc);
-  settings.onNavigate = (file) => {
-    sidebar.displaySelected(file);
-    loadFile(file);
-  };
+  const localStateDoc = new Y.Doc();
+  documents.syncDoc(localStateDoc, "localState");
 
-  const fileSystemDoc = new Y.Doc();
-  localSync.syncDoc(fileSystemDoc, "filesystem");
+  const uiState = localStateDoc.getMap("uiState");
 
-  const uiState = settingsDoc.getMap("uiState");
-
-  const collapseButton = document.getElementById("collapse-sidebar-button")!;
-  collapseButton.addEventListener("click", () => {
-    uiState.set("sidebarCollapsed", !uiState.get("sidebarCollapsed"));
-  });
-
-  uiState.observe(() => {
-    const collapsed = uiState.get("sidebarCollapsed") ?? false;
-    const sidebar = document.getElementById("sidebar")!;
-    if (collapsed) {
-      collapseButton.classList.add("collapsed");
-      sidebar.classList.add("collapsed");
-    } else {
-      collapseButton.classList.remove("collapsed");
-      sidebar.classList.remove("collapsed");
-    }
-  });
-
-  const sidebar = new Sidebar(
-    document.querySelector<HTMLElement>("#sidebar")!,
-    fileSystemDoc
-  );
-  sidebar.onFileSelected = (file) => {
-    settings.navigateTo(file);
-    if (isMobile()) {
-      collapseButton.classList.add("collapsed");
-      document.getElementById("sidebar")!.classList.add("collapsed");
-    }
-  };
-
-  document.querySelector(".rename")!.addEventListener("click", () => {
-    const currentFile = settings.getCurrentFile();
-    if (currentFile === null) {
-      alert("No file selected");
+  const navigationHistory = localStateDoc.getArray<string>("navigationHistory");
+  navigationHistory.observe(async () => {
+    if (navigationHistory.length === 0) {
       return;
     }
 
-    const newName = prompt("Enter new name:", currentFile);
-    if (newName) {
-      sidebar.renameFile(currentFile, newName);
-    }
+    currentNoteId = navigationHistory.get(navigationHistory.length - 1);
+    await loadNote(documents, notes, currentNoteId);
   });
 
-  document.querySelector(".delete")!.addEventListener("click", () => {
-    const currentFile = settings.getCurrentFile();
-    if (currentFile === null) {
-      alert("No file selected");
-      return;
-    }
+  const sharedStateDoc = new Y.Doc();
+  documents.syncDoc(sharedStateDoc, "sharedState");
 
-    const confirmed = confirm(
-      `Are you sure you want to delete ${currentFile}?`
-    );
-    if (confirmed) {
-      sidebar.deleteFile(currentFile);
-    }
-  });
+  const notes = sharedStateDoc.getMap<NoteEntry>("notes");
+
+  const sidebar = document.querySelector<HTMLElement>("#sidebar")!;
+  const sidebarReload = () => {
+    renderSidebar(sidebar, notes, currentNoteId, (noteId) => {
+      navigationHistory.push([noteId]);
+
+      if (isMobile()) {
+        sidebar.classList.add("collapsed");
+        document
+          .getElementById("button.collapse-sidebar")!
+          .classList.add("collapsed");
+      }
+    });
+  };
+  notes.observeDeep(sidebarReload);
+  navigationHistory.observe(sidebarReload);
+
+  sidebar
+    .querySelector("button.create")!
+    .addEventListener("click", async () => {
+      const noteTitle = prompt("Enter title:");
+      if (!noteTitle) {
+        return;
+      }
+
+      const noteId = Date.now().toString();
+      notes.set(noteId, new Y.Map([["title", noteTitle]]));
+      await loadNote(documents, notes, noteId);
+      // TODO: find a way to create a ydoc from tiptap content instead of this
+      editor!.commands.setContent({
+        type: "doc",
+        content: [
+          { type: "heading", content: [{ type: "text", text: noteTitle }] },
+        ],
+      });
+      navigationHistory.push([noteId]);
+    });
+
+  document
+    .querySelector("button.delete")!
+    .addEventListener("click", async () => {
+      if (currentNoteId === undefined) {
+        alert("No note selected");
+        return;
+      }
+
+      const confirmed = confirm(
+        `Are you sure you want to delete ${currentNoteId}?`
+      );
+      if (confirmed) {
+        editor?.destroy();
+        await documents.deleteDoc("notes/" + currentNoteId);
+        notes.delete(currentNoteId);
+        navigationHistory.doc!.transact(() => {
+          for (let i = navigationHistory.length - 1; i >= 0; i--) {
+            if (navigationHistory.get(i) === currentNoteId) {
+              navigationHistory.delete(i, 1);
+            }
+          }
+        });
+      }
+    });
 
   if (isMobile()) {
     // fix for chrome android
@@ -129,22 +143,63 @@ async function main() {
       editor.chain().focus().redo().run();
     });
   }
+
+  document
+    .querySelector("button.collapse-sidebar")!
+    .addEventListener("click", () => {
+      uiState.set("sidebarCollapsed", !uiState.get("sidebarCollapsed"));
+    });
+
+  let sidebarToggleCount = 0;
+  uiState.observe(() => {
+    const collapsed = uiState.get("sidebarCollapsed") ?? false;
+
+    const sidebar = document.getElementById("sidebar")!;
+    const collapseButton = document.querySelector("button.collapse-sidebar")!;
+
+    if (collapsed) {
+      sidebar.classList.add("collapsed");
+      collapseButton.classList.add("collapsed");
+    } else {
+      sidebar.classList.remove("collapsed");
+      collapseButton.classList.remove("collapsed");
+    }
+
+    if (sidebarToggleCount === 0) {
+      sidebar.classList.add("no-transition");
+      sidebar.offsetHeight;
+      sidebar.classList.remove("no-transition");
+    }
+
+    sidebarToggleCount += 1;
+  });
 }
 
-async function loadFile(file: string) {
+async function loadNote(
+  documents: DocumentStore,
+  notes: Y.Map<NoteEntry>,
+  noteId: string
+) {
   if (editor !== undefined) {
     editor.destroy();
   }
 
   currentDoc = new Y.Doc();
-  await localSync.syncDoc(currentDoc, file);
+  await documents.syncDoc(currentDoc, "notes/" + noteId);
+
+  currentDoc.on("update", async () => {
+    if (editor === undefined) {
+      return;
+    }
+
+    const workingTitle = editor.getJSON().content?.[0].content?.[0].text;
+    notes.get(noteId)?.set("title", workingTitle ?? "");
+  });
 
   editor = new Editor({
     element: document.querySelector("#editor")!,
     extensions: [
-      Document.extend({
-        content: "heading block*",
-      }),
+      TIPTAP_DOC_SCHEMA,
       Placeholder.configure({
         placeholder: ({ node, pos }) => {
           if (pos === 0 && node.type.name === "heading") {
@@ -161,6 +216,33 @@ async function loadFile(file: string) {
       }),
     ],
   });
+}
+
+function renderSidebar(
+  container: Element,
+  notes: Y.Map<NoteEntry>,
+  currentNoteId: string | undefined,
+  onNoteClick: (noteId: string) => void
+) {
+  const list = container.querySelector(".items")!;
+  list.innerHTML = "";
+
+  for (const [noteId, note] of notes.entries()) {
+    const listItem = list.appendChild(document.createElement("li"));
+    listItem.innerHTML = `<span></span>`;
+
+    let title = note.get("title") as string;
+    if (!title?.trim()) {
+      title = "<untitled>";
+    }
+    listItem.querySelector("span")!.textContent = title;
+
+    if (noteId === currentNoteId) {
+      listItem.classList.add("selected");
+    }
+
+    listItem.addEventListener("click", () => onNoteClick(noteId));
+  }
 }
 
 function setupOverKeyboardBar(bar: HTMLElement) {
@@ -189,38 +271,4 @@ function isMobile() {
       navigator.userAgent
     )
   );
-}
-
-function showLoading() {
-  const loading = document.body.appendChild(document.createElement("div"));
-  loading.style.position = "fixed";
-  loading.style.top = "50%";
-  loading.style.left = "50%";
-  loading.style.transform = "translate(-50%, -50%)";
-  loading.style.fontSize = "24px";
-  loading.style.color = "var(--font-color)";
-
-  let loaded = false;
-
-  {
-    const timerElement = loading.appendChild(document.createElement("span"));
-
-    const start = Date.now();
-    function updateTimer() {
-      const millis = Date.now() - start;
-      const seconds = (millis / 1000).toFixed(2);
-      timerElement.textContent = `(${seconds}s) Loading ...`;
-
-      if (!loaded) {
-        requestAnimationFrame(updateTimer);
-      }
-    }
-
-    updateTimer();
-  }
-
-  return () => {
-    loaded = true;
-    document.body.removeChild(loading);
-  };
 }

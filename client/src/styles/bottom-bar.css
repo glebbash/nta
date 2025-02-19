@@ -11,20 +11,20 @@
   }
 }
 
-.collapse-sidebar-button {
+button.collapse-sidebar {
   margin: 8px;
   z-index: 10;
 }
 
-.collapse-sidebar-button .close {
+button.collapse-sidebar .close {
   display: none;
 }
 
-.collapse-sidebar-button.collapsed .open {
+button.collapse-sidebar.collapsed .open {
   display: none;
 }
 
-.collapse-sidebar-button.collapsed .close {
+button.collapse-sidebar.collapsed .close {
   display: block;
 }
 
