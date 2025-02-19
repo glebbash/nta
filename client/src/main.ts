@@ -227,6 +227,7 @@ async function loadNote(
       }),
     ],
   });
+  (editor.options.element as HTMLElement).spellcheck = false;
 }
 
 function renderSidebar(
