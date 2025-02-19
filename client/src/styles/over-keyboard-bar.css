@@ -1,0 +1,25 @@
+html {
+  overflow: clip;
+}
+.over-keyboard-bar {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  display: none;
+  z-index: 1000;
+}
+.over-keyboard-bar {
+  background: var(--background);
+  font-size: 18px;
+}
+.okb-btn {
+  font-weight: bold;
+  background-color: var(--background-secondary);
+  color: var(--font-color);
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  padding: 8px 16px;
+  font-size: 18px;
+  font-family: monospace;
+}

@@ -2,6 +2,7 @@
 @import url("./bottom-bar.css");
 @import url("./editor.css");
 @import url("./sidebar.css");
+@import url("./over-keyboard-bar.css");
 
 :root {
   --background: #171717;
@@ -39,31 +40,4 @@ button {
 
 button:hover {
   background-color: var(--highlight);
-}
-
-/* over keyboard bar */
-html {
-  overflow: clip;
-}
-.over-keyboard-bar {
-  position: fixed;
-  left: 0;
-  width: 100%;
-  display: none;
-  z-index: 1000;
-}
-.over-keyboard-bar {
-  background: var(--background);
-  font-size: 18px;
-}
-.okb-btn {
-  font-weight: bold;
-  background-color: var(--background-secondary);
-  color: var(--font-color);
-  margin: 0;
-  border: none;
-  border-radius: 0;
-  padding: 8px 16px;
-  font-size: 18px;
-  font-family: monospace;
 }

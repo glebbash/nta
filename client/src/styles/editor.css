@@ -45,7 +45,7 @@
 
 /* Heading styles */
 
-.tiptap h1:first-child {
+.tiptap > :first-child {
   margin-top: 0;
 }
 

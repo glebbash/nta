@@ -12,6 +12,7 @@
     "@tiptap/starter-kit": "^2.11.5",
     "idb": "^8.0.2",
     "y-prosemirror": "^1.2.15",
+    "y-webrtc": "^10.3.0",
     "yjs": "^13.6.23"
   }
 }

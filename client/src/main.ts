@@ -9,6 +9,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import * as Y from "yjs";
 
 import { DocumentStore } from "./document-store.js";
+import { DocumentSync } from "./document-sync.js";
 
 type NoteEntry = Y.Map<unknown>;
 
@@ -20,13 +21,16 @@ let editor: Editor | undefined;
 let currentNoteId: string | undefined;
 let currentDoc: Y.Doc | undefined;
 
-await main();
+await main().catch((err) => {
+  alert("ERROR: " + err);
+});
 
 async function main() {
   const documents = await DocumentStore.load("nta");
+  const sync = new DocumentSync();
 
   const localStateDoc = new Y.Doc();
-  documents.syncDoc(localStateDoc, "localState");
+  documents.track(localStateDoc, "localState");
 
   const uiState = localStateDoc.getMap("uiState");
 
@@ -37,11 +41,12 @@ async function main() {
     }
 
     currentNoteId = navigationHistory.get(navigationHistory.length - 1);
-    await loadNote(documents, notes, currentNoteId);
+    await loadNote(documents, sync, notes, currentNoteId);
   });
 
   const sharedStateDoc = new Y.Doc();
-  documents.syncDoc(sharedStateDoc, "sharedState");
+  documents.track(sharedStateDoc, "sharedState");
+  sync.track(sharedStateDoc, "sharedState");
 
   const notes = sharedStateDoc.getMap<NoteEntry>("notes");
 
@@ -71,7 +76,7 @@ async function main() {
 
       const noteId = Date.now().toString();
       notes.set(noteId, new Y.Map([["title", noteTitle]]));
-      await loadNote(documents, notes, noteId);
+      await loadNote(documents, sync, notes, noteId);
       // TODO: find a way to create a ydoc from tiptap content instead of this
       editor!.commands.setContent({
         type: "doc",
@@ -177,6 +182,7 @@ async function main() {
 
 async function loadNote(
   documents: DocumentStore,
+  sync: DocumentSync,
   notes: Y.Map<NoteEntry>,
   noteId: string
 ) {
@@ -184,11 +190,16 @@ async function loadNote(
     editor.destroy();
   }
 
-  currentDoc = new Y.Doc();
-  await documents.syncDoc(currentDoc, "notes/" + noteId);
+  if (currentDoc !== undefined) {
+    currentDoc.destroy();
+  }
 
-  currentDoc.on("update", async () => {
-    if (editor === undefined) {
+  currentDoc = new Y.Doc();
+  await documents.track(currentDoc, "notes/" + noteId);
+  sync.track(currentDoc, "notes/" + noteId);
+
+  currentDoc.on("update", async (_update, origin) => {
+    if (editor === undefined || origin === DocumentStore.ORIGIN) {
       return;
     }
 
