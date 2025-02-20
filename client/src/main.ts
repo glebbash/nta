@@ -1,11 +1,8 @@
 import { Editor } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
-import { Color } from "@tiptap/extension-color";
-import ListItem from "@tiptap/extension-list-item";
 import TextStyle from "@tiptap/extension-text-style";
 import Collaboration from "@tiptap/extension-collaboration";
 import Document from "@tiptap/extension-document";
-import Placeholder from "@tiptap/extension-placeholder";
 import * as Y from "yjs";
 
 import { DocumentStore } from "./document-store.js";
@@ -13,10 +10,7 @@ import { DocumentSync } from "./document-sync.js";
 
 type NoteEntry = Y.Map<unknown>;
 
-const TIPTAP_DOC_SCHEMA = Document.extend({
-  content: "heading block*",
-});
-
+let titleEditor!: Editor;
 let editor: Editor | undefined;
 let currentNoteId: string | undefined;
 let currentDoc: Y.Doc | undefined;
@@ -76,14 +70,6 @@ async function main() {
 
       const noteId = Date.now().toString();
       notes.set(noteId, new Y.Map([["title", noteTitle]]));
-      await loadNote(documents, sync, notes, noteId);
-      // TODO: find a way to create a ydoc from tiptap content instead of this
-      editor!.commands.setContent({
-        type: "doc",
-        content: [
-          { type: "heading", content: [{ type: "text", text: noteTitle }] },
-        ],
-      });
       navigationHistory.push([noteId]);
     });
 
@@ -178,6 +164,39 @@ async function main() {
 
     sidebarToggleCount += 1;
   });
+
+  titleEditor = new Editor({
+    element: document.querySelector(".editor-title")!,
+    extensions: [
+      Document.extend({ content: "heading" }),
+      TextStyle.configure({}),
+      StarterKit.configure({ history: false, document: false }),
+    ],
+    content: tiptapSingleH1Doc("<untitled>"),
+  });
+  titleEditor.on("update", async () => {
+    if (currentNoteId === undefined) {
+      return;
+    }
+
+    const workingTitle = titleEditor.getJSON().content?.[0].content?.[0].text;
+    notes.get(currentNoteId)?.set("title", workingTitle ?? "");
+  });
+
+  const showPropertiesButton = document.querySelector(
+    "button.show-properties"
+  )!;
+  const propertiesContent = document.querySelector<HTMLElement>(
+    ".doc-properties-content"
+  )!;
+  showPropertiesButton.addEventListener("click", () => {
+    showPropertiesButton.classList.toggle("active");
+    if (propertiesContent.style.height) {
+      propertiesContent.style.height = null as never;
+    } else {
+      propertiesContent.style.height = propertiesContent.scrollHeight + "px";
+    }
+  });
 }
 
 async function loadNote(
@@ -198,36 +217,18 @@ async function loadNote(
   await documents.track(currentDoc, "notes/" + noteId);
   sync.track(currentDoc, "notes/" + noteId);
 
-  currentDoc.on("update", async (_update, origin) => {
-    if (editor === undefined || origin === DocumentStore.ORIGIN) {
-      return;
-    }
-
-    const workingTitle = editor.getJSON().content?.[0].content?.[0].text;
-    notes.get(noteId)?.set("title", workingTitle ?? "");
-  });
+  titleEditor.commands.setContent(
+    tiptapSingleH1Doc(notes.get(noteId)?.get("title") as string)
+  );
 
   editor = new Editor({
-    element: document.querySelector("#editor")!,
+    element: document.querySelector(".editor")!,
     extensions: [
-      TIPTAP_DOC_SCHEMA,
-      Placeholder.configure({
-        placeholder: ({ node, pos }) => {
-          if (pos === 0 && node.type.name === "heading") {
-            return "<title>";
-          }
-          return "";
-        },
-      }),
-      Color.configure({ types: [TextStyle.name, ListItem.name] }),
       TextStyle.configure({}),
-      StarterKit.configure({ history: false, document: false }),
-      Collaboration.configure({
-        document: currentDoc,
-      }),
+      StarterKit.configure({ history: false }),
+      Collaboration.configure({ document: currentDoc }),
     ],
   });
-  (editor.options.element as HTMLElement).spellcheck = false;
 }
 
 function renderSidebar(
@@ -283,4 +284,17 @@ function isMobile() {
       navigator.userAgent
     )
   );
+}
+
+function tiptapSingleH1Doc(title: string) {
+  return {
+    type: "doc",
+    content: [
+      {
+        type: "heading",
+        content: [{ type: "text", text: title }],
+        attrs: { level: 1 },
+      },
+    ],
+  };
 }

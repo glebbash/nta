@@ -1,16 +1,62 @@
-#editor {
+:root {
+  --h-padding: 64px;
+}
+
+.editor-title-bar {
+  display: flex;
+  padding: 0 var(--h-padding);
+  padding-top: 64px;
+  padding-bottom: 0px;
+}
+
+.doc-properties {
+  margin: 0 var(--h-padding);
+  border: 1px solid var(--background-secondary);
+  overflow: clip;
+}
+
+.doc-properties-content {
+  height: 0;
+  transition: all 0.3s ease;
+}
+
+.editor {
   flex-grow: 1;
-  padding: 64px;
+  padding: 0 var(--h-padding);
   overflow: auto;
   white-space: pre-wrap;
   scrollbar-color: var(--background-secondary) var(--background);
 }
 
 @media (max-width: 768px) {
-  #editor {
+  .editor-title-bar {
     padding: 16px;
+    padding-bottom: 0;
+  }
+  .doc-properties {
+    margin: 0 16px;
+  }
+  .editor {
+    padding: 0 16px;
     padding-bottom: 80px;
   }
+}
+
+button.show-properties {
+  margin: 12px 0;
+  margin-left: auto;
+}
+
+button.show-properties .close {
+  display: none;
+}
+
+button.show-properties.active .open {
+  display: none;
+}
+
+button.show-properties.active .close {
+  display: block;
 }
 
 .edit-area {
@@ -25,12 +71,10 @@
   outline: none;
 }
 
-/* fixes weird top margin */
-.tiptap :first-child {
-  margin-bottom: 0;
+.editor-title .tiptap :first-child {
+  margin: 0;
 }
 
-/* List styles */
 .tiptap ul,
 .tiptap ol {
   padding: 0 1rem;
@@ -41,12 +85,6 @@
 .tiptap ol li p {
   margin-bottom: 0.25em;
   margin-bottom: 0.25em;
-}
-
-/* Heading styles */
-
-.tiptap > :first-child {
-  margin-top: 0;
 }
 
 .tiptap h1,
