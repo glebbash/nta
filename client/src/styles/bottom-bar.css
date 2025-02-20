@@ -16,16 +16,16 @@ button.collapse-sidebar {
   z-index: 10;
 }
 
-button.collapse-sidebar .close {
+button.collapse-sidebar .open {
   display: none;
 }
 
-button.collapse-sidebar.collapsed .open {
-  display: none;
-}
-
-button.collapse-sidebar.collapsed .close {
+button.collapse-sidebar.active .open {
   display: block;
+}
+
+button.collapse-sidebar.active .close {
+  display: none;
 }
 
 /* dotdotdot menu */
