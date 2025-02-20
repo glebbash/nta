@@ -122,15 +122,15 @@ async function main() {
     let sidebarToggleCount = 0;
     const collapseButton = document.querySelector("button.collapse-sidebar")!;
     collapseButton.addEventListener("click", () => {
-      uiState.set("sidebarCollapsed", !uiState.get("sidebarCollapsed"));
+      uiState.set("sidebarOpen", !uiState.get("sidebarOpen"));
     });
     uiState.observe(() => {
-      if (uiState.get("sidebarCollapsed") ?? false) {
-        collapseButton.classList.remove("active");
-        sidebar.classList.add("collapsed");
-      } else {
+      if (uiState.get("sidebarOpen") ?? false) {
         collapseButton.classList.add("active");
-        sidebar.classList.remove("collapsed");
+        sidebar.classList.add("open");
+      } else {
+        collapseButton.classList.remove("active");
+        sidebar.classList.remove("open");
       }
 
       if (sidebarToggleCount++ === 0) {
