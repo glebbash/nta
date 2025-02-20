@@ -12,6 +12,11 @@
 }
 
 @media (max-width: 768px) {
+  .sidebar {
+    position: absolute;
+    height: 100%;
+    z-index: 1;
+  }
   .sidebar.open {
     width: 80%;
     min-width: 80%;
