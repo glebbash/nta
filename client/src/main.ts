@@ -103,14 +103,17 @@ async function main() {
       const workingTitle = titleEditor.getJSON().content?.[0].content?.[0].text;
       notes.get(currentNoteId)?.set("title", workingTitle ?? "");
     });
-    notes.observeDeep(() => {
+    notes.observeDeep(updateTitle);
+    navigationHistory.observeDeep(updateTitle);
+
+    function updateTitle() {
       if (currentNoteId === undefined) {
         return;
       }
 
       const title = notes.get(currentNoteId)?.get("title") as string;
       titleEditor.commands.setContent(tiptapSingleH1Doc(title));
-    });
+    }
   }
 
   // setup sidebar
@@ -120,16 +123,18 @@ async function main() {
     navigationHistory.observe(renderSidebar);
 
     let sidebarToggleCount = 0;
-    const collapseButton = document.querySelector("button.collapse-sidebar")!;
-    collapseButton.addEventListener("click", () => {
+    const sidebarOpenButton = document.querySelector(
+      "button.collapse-sidebar"
+    )!;
+    sidebarOpenButton.addEventListener("click", () => {
       uiState.set("sidebarOpen", !uiState.get("sidebarOpen"));
     });
     uiState.observe(() => {
       if (uiState.get("sidebarOpen") ?? false) {
-        collapseButton.classList.add("active");
+        sidebarOpenButton.classList.add("active");
         sidebar.classList.add("open");
       } else {
-        collapseButton.classList.remove("active");
+        sidebarOpenButton.classList.remove("active");
         sidebar.classList.remove("open");
       }
 
@@ -162,7 +167,7 @@ async function main() {
           navigationHistory.push([noteId]);
 
           if (isMobile()) {
-            uiState.set("sidebarCollapsed", true);
+            uiState.set("sidebarOpen", false);
           }
         });
       }
