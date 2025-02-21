@@ -14,5 +14,8 @@
     "y-prosemirror": "^1.2.15",
     "y-webrtc": "^10.3.0",
     "yjs": "^13.6.23"
+  },
+  "devDependencies": {
+    "vite-plugin-pwa": "^0.21.1"
   }
 }
