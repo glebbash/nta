@@ -112,7 +112,7 @@ async function main() {
       }
 
       const title = notes.get(currentNoteId)?.get("title") as string;
-      titleEditor.commands.setContent(tiptapSingleH1Doc(title));
+      titleEditor.commands.setContent(tiptapSingleH1Doc(title ?? " "));
     }
   }
 

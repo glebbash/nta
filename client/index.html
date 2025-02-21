@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="./nta-icon.png" />
     <title>NTA</title>
 
     <link
@@ -38,9 +39,14 @@
       <div class="doc-properties">
         <div class="doc-properties-content">
           <div style="padding: 8px">
-            <span style="font-family: monospace; font-size: 16px"></span>
-              // TODO: add properties here
-            </span>
+            type:
+            <select>
+              <option value="inbox">Inbox</option>
+              <option value="note">Note</option>
+              <option value="task">Task</option>
+              <option value="event">Event</option>
+            </select>
+            <br />
           </div>
         </div>
       </div>
