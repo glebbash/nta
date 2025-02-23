@@ -52,8 +52,11 @@ async function main() {
           return true;
         }
 
+        const noteTitle =
+          (notes.get(currentNoteId)?.get("title") as string) ?? "<untitled>";
+
         const confirmed = confirm(
-          `Are you sure you want to delete ${currentNoteId}?`
+          `Are you sure you want to delete ${noteTitle}?`
         );
         if (confirmed) {
           editor?.destroy();
@@ -232,7 +235,10 @@ async function main() {
       window.scrollTo(0, 0);
     });
 
-    setupOverKeyboardBar(document.querySelector(".over-keyboard-bar")!);
+    setupOverKeyboardBar(
+      document.querySelector(".over-keyboard-bar")!,
+      (element) => element.classList.contains("tiptap")
+    );
     document.querySelector("#tab-btn")!.addEventListener("click", () => {
       if (editor === undefined) {
         return;
@@ -287,13 +293,21 @@ async function main() {
   }
 }
 
-function setupOverKeyboardBar(bar: HTMLElement) {
+function setupOverKeyboardBar(
+  bar: HTMLElement,
+  shouldOpenFor: (element: Element) => boolean
+) {
   window.visualViewport!.addEventListener("resize", updateOverlay);
   window.visualViewport!.addEventListener("scroll", updateOverlay);
 
   function updateOverlay() {
     const keyboardHeight = window.innerHeight - window.visualViewport!.height;
-    if (keyboardHeight <= 0) {
+
+    if (
+      keyboardHeight <= 0 ||
+      !document.activeElement ||
+      !shouldOpenFor(document.activeElement)
+    ) {
       bar.style.display = "none";
       return;
     }

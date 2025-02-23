@@ -1,0 +1,34 @@
+dialog.command-palette {
+  margin-top: 64px;
+  padding: 6px;
+  border: none;
+
+  background-color: var(--background);
+  color: var(--font-color);
+  font-family: monospace;
+  font-size: 14pt;
+}
+
+dialog.command-palette::backdrop {
+  background-color: var(--highlight);
+}
+
+dialog.command-palette input {
+  width: 80vw;
+  border: none;
+  outline: none;
+
+  background-color: transparent;
+  color: white;
+  font-family: monospace;
+  font-size: 14pt;
+}
+
+/* drop the ugly clear input button */
+input[type="search"]::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+dialog .action-item.selected {
+  background-color: var(--highlight);
+}

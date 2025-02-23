@@ -1,8 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Sans+Mono:wght@400;700&display=swap");
+
 @import url("./bottom-bar.css");
 @import url("./editor.css");
 @import url("./sidebar.css");
 @import url("./over-keyboard-bar.css");
+@import url("./command-palette.css");
 
 :root {
   --background: #171717;
