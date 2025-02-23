@@ -8,6 +8,7 @@ import * as Y from "yjs";
 import { DocumentStore } from "./document-store.js";
 import { DocumentSync } from "./document-sync.js";
 import { NoteEntry } from "./types.js";
+import { CommandPalette } from "./command-palette.js";
 
 await main().catch((err) => {
   alert("ERROR: " + err);
@@ -42,27 +43,13 @@ async function main() {
 
   const notes = sharedStateDoc.getMap<NoteEntry>("notes");
 
-  // setup create/delete buttons
+  // setup command palette
   {
-    document
-      .querySelector("button.create")!
-      .addEventListener("click", async () => {
-        const noteTitle = prompt("Enter title:");
-        if (!noteTitle) {
-          return;
-        }
-
-        const noteId = Date.now().toString();
-        notes.set(noteId, new Y.Map([["title", noteTitle]]));
-        navigationHistory.push([noteId]);
-      });
-
-    document
-      .querySelector("button.delete")!
-      .addEventListener("click", async () => {
+    const cp = new CommandPalette(notes, async (action) => {
+      if (action.id === "deleteCurrentDoc") {
         if (currentNoteId === undefined) {
           alert("No note selected");
-          return;
+          return true;
         }
 
         const confirmed = confirm(
@@ -80,7 +67,43 @@ async function main() {
             }
           });
         }
+        return true;
+      }
+
+      if (action.id === "openDoc") {
+        navigationHistory.push([action.docId]);
+        return true;
+      }
+
+      if (action.id === "createDoc") {
+        const noteId = Date.now().toString();
+        notes.set(noteId, new Y.Map([["title", action.docTitle]]));
+        navigationHistory.push([noteId]);
+        return true;
+      }
+
+      if (action.id === "testApi") {
+        const response = await fetch("/api/hello");
+        const text = await response.text();
+        alert(text);
+        return true;
+      }
+
+      alert("Action not supported yet: " + (action as any).id);
+      return false;
+    });
+
+    document
+      .querySelector("button.open-command-palette")!
+      .addEventListener("click", () => {
+        cp.openDialog();
       });
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey && e.key === "p") {
+        e.preventDefault();
+        cp.openDialog();
+      }
+    });
   }
 
   // setup title editor

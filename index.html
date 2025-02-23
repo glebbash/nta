@@ -22,16 +22,13 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0"
     />
-    <link rel="stylesheet" href="./src/client/styles/_all.css" />
+    <link rel="stylesheet" href="/styles/_all.css" />
   </head>
   <body>
     <div id="sidebar" class="sidebar">
       <div class="inbox">
         <div class="actions">
           <span class="title">Inbox</span>
-          <button class="create">
-            <span class="material-symbols-outlined">add</span>
-          </button>
         </div>
         <ul class="items"></ul>
       </div>
@@ -73,14 +70,9 @@
           <span class="material-symbols-outlined">left_panel_open</span>
         </div>
       </button>
-      <div class="dotdotdot-button">
-        <button>
-          <span class="material-symbols-outlined">more_horiz</span>
-        </button>
-        <div class="dotdotdot-content">
-          <button class="delete">Delete</button>
-        </div>
-      </div>
+      <button class="open-command-palette">
+        <span class="material-symbols-outlined">bolt</span>
+      </button>
     </div>
     <div class="over-keyboard-bar">
       <button id="tab-btn" class="okb-btn">*&gt;</button>

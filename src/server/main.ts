@@ -17,10 +17,12 @@ main();
 function main() {
   const app = express();
 
-  setupAuth(app);
+  if (process.env.NO_AUTH !== "true") {
+    setupAuth(app);
+  }
 
   app.get("/api/hello", (_, res) => {
-    res.send("Hello from express");
+    res.send("Hello from the server!");
   });
 
   ViteExpress.listen(app, +PORT, () => {

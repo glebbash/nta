@@ -28,31 +28,10 @@ button.collapse-sidebar.active .close {
   display: none;
 }
 
-/* dotdotdot menu */
-
-.dotdotdot-button {
+button.open-command-palette {
   position: absolute;
   bottom: 0;
   right: 0;
   display: inline-block;
   margin: 8px;
-}
-
-.dotdotdot-content {
-  display: none;
-  position: absolute;
-  background-color: var(--background-secondary);
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  right: 0;
-  bottom: 100%;
-  padding: 8px;
-  border-radius: 8px;
-}
-
-.dotdotdot-button:hover .dotdotdot-content {
-  display: block;
-}
-
-.dotdotdot-button button {
-  font-size: 16px;
 }
