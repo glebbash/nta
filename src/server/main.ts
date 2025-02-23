@@ -6,6 +6,7 @@ import session from "express-session";
 import ViteExpress from "vite-express";
 import Passport from "passport";
 import GitHubAuth from "passport-github2";
+import { ExpressStaticGzipOptions } from "express-static-gzip";
 
 const PORT = process.env.PORT || 5173;
 const HOSTNAME = process.env.HOSTNAME!;
@@ -19,6 +20,8 @@ function main() {
 
   if (process.env.NO_AUTH !== "true") {
     setupAuth(app);
+  } else {
+    ViteExpress.static(getViteExpressOptions());
   }
 
   app.get("/api/hello", (_, res) => {
@@ -68,7 +71,7 @@ function setupAuth(app: express.Express) {
   });
 
   // serve static files before checking authentication
-  app.use(ViteExpress.static());
+  app.use(ViteExpress.static(getViteExpressOptions()));
 
   app.use((req, res, next) => {
     if (!req.isAuthenticated()) {
@@ -83,4 +86,19 @@ function setupAuth(app: express.Express) {
       res.redirect("/");
     });
   });
+}
+
+function getViteExpressOptions(): ExpressStaticGzipOptions {
+  return {
+    serveStatic: {
+      setHeaders: (res) => {
+        res.setHeader(
+          "Cache-Control",
+          "private, no-cache, no-store, must-revalidate"
+        );
+        res.setHeader("Expires", "-1");
+        res.setHeader("Pragma", "no-cache");
+      },
+    },
+  };
 }
