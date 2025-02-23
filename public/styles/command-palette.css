@@ -7,6 +7,8 @@ dialog.command-palette {
   color: var(--font-color);
   font-family: monospace;
   font-size: 14pt;
+
+  border-radius: 8px;
 }
 
 dialog.command-palette::backdrop {
@@ -25,8 +27,17 @@ dialog.command-palette input {
 }
 
 /* drop the ugly clear input button */
-input[type="search"]::-webkit-search-cancel-button {
+dialog input[type="search"]::-webkit-search-cancel-button {
   appearance: none;
+}
+
+dialog input {
+  padding: 4px;
+}
+
+dialog .action-item {
+  border-radius: 6px;
+  padding: 4px;
 }
 
 dialog .action-item.selected {
