@@ -9,26 +9,33 @@
     "build": "vite build"
   },
   "dependencies": {
-    "express": "^4.21.2",
-    "vite-express": "^0.20.0",
     "@tiptap/core": "^2.11.5",
     "@tiptap/extension-collaboration": "^2.11.5",
     "@tiptap/extension-color": "^2.11.5",
     "@tiptap/extension-placeholder": "^2.11.5",
     "@tiptap/pm": "^2.11.5",
     "@tiptap/starter-kit": "^2.11.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
     "idb": "^8.0.2",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12",
+    "vite-express": "^0.20.0",
     "y-prosemirror": "^1.2.15",
     "y-webrtc": "^10.3.0",
     "yjs": "^13.6.23"
   },
   "devDependencies": {
     "@types/express": "^4.17.15",
+    "@types/express-session": "^1.18.1",
     "@types/node": "^22.13.5",
+    "@types/passport": "^1.0.17",
+    "@types/passport-github2": "^1.2.9",
     "nodemon": "^3.1.9",
-    "vite": "^6.1.1",
-    "vite-plugin-pwa": "^0.21.1",
     "tsx": "^4.19.3",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vite": "^6.1.1",
+    "vite-plugin-pwa": "^0.21.1"
   }
 }
