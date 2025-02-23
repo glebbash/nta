@@ -13,14 +13,28 @@ import { DocumentStore } from "./document-store.js";
 import { DocumentSync } from "./document-sync.js";
 import { NoteEntry } from "./types.js";
 import { CommandPalette } from "./command-palette.js";
+import Link from "@tiptap/extension-link";
 
 const USER_KEY_ITEM_ID = "userKey";
+const TIPTAP_EXTENSIONS = [
+  Link.configure({
+    HTMLAttributes: { rel: null, target: null },
+    protocols: [{ scheme: "note" }],
+  }),
+  TextStyle.configure({}),
+  StarterKit.configure({ history: false }),
+];
+const TIPTAP_SCHEMA = getSchema(TIPTAP_EXTENSIONS);
 
 await main().catch((err) => {
   alert("ERROR: " + err);
 });
 
 async function main() {
+  let editor: Editor | undefined;
+  let currentNoteId: string | undefined;
+  let currentDoc: Y.Doc | undefined;
+
   let userKey = localStorage.getItem(USER_KEY_ITEM_ID);
   if (userKey === null) {
     if (crypto.randomUUID) {
@@ -32,10 +46,6 @@ async function main() {
     }
     localStorage.setItem(USER_KEY_ITEM_ID, userKey);
   }
-
-  let editor: Editor | undefined;
-  let currentNoteId: string | undefined;
-  let currentDoc: Y.Doc | undefined;
 
   const documents = await DocumentStore.load("nta");
   const sync = new DocumentSync();
@@ -56,6 +66,15 @@ async function main() {
 
     currentNoteId = navigationHistory.get(navigationHistory.length - 1);
     await loadNote(currentNoteId);
+  });
+
+  // handle internal links
+  document.addEventListener("pointerdown", async (e) => {
+    const link = e.target as HTMLAnchorElement | undefined;
+    if (link?.tagName === "A" && link.href.startsWith("note:")) {
+      e.preventDefault();
+      navigationHistory.push([link.href.slice("note:".length)]);
+    }
   });
 
   const notes = sharedStateDoc.getMap<NoteEntry>("notes");
@@ -157,8 +176,7 @@ async function main() {
 
         const doc = await htmlToYDoc(htmlContent);
         await documents.createDoc("notes/" + currentNoteId, doc);
-        doc.destroy();
-        await loadNote(currentNoteId);
+        window.location.reload();
 
         return true;
       }
@@ -371,8 +389,7 @@ async function main() {
     editor = new Editor({
       element: document.querySelector(".editor")!,
       extensions: [
-        TextStyle.configure({}),
-        StarterKit.configure({ history: false }),
+        ...TIPTAP_EXTENSIONS,
         Collaboration.configure({ document: currentDoc }),
       ],
     });
@@ -455,20 +472,13 @@ async function getUploadedJsonFile<T = unknown>(): Promise<T | null> {
   });
 }
 
-const schema = getSchema([StarterKit]);
-
 async function htmlToYDoc(html: string): Promise<Y.Doc> {
   const dom = parseHTML(html);
-  const pmJson = DOMParser.fromSchema(schema).parse(dom).toJSON();
+  const pmJson = DOMParser.fromSchema(TIPTAP_SCHEMA).parse(dom).toJSON();
 
   const ydoc = new Y.Doc();
   const yXmlFragment = ydoc.getXmlFragment("default");
-  prosemirrorJSONToYXmlFragment(schema, pmJson, yXmlFragment);
-
-  console.log({
-    pmJson,
-    result: ydoc.getXmlFragment("default").toJSON(),
-  });
+  prosemirrorJSONToYXmlFragment(TIPTAP_SCHEMA, pmJson, yXmlFragment);
 
   return ydoc;
 }

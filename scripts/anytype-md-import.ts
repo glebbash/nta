@@ -64,7 +64,7 @@ async function processDoc(ctx: ProcessingCtx) {
       ctx.fileNameToIdMapping.set(href, crypto.randomUUID());
     }
 
-    $(link).attr("href", `/#${ctx.fileNameToIdMapping.get(href)}`);
+    $(link).attr("href", `note:${ctx.fileNameToIdMapping.get(href)}`);
   });
 
   const docHtml = $("body").html()?.trim() ?? "";
