@@ -35,3 +35,15 @@ button.open-command-palette {
   display: inline-block;
   margin: 8px;
 }
+
+button.open-command-palette .offline {
+  display: none;
+}
+
+button.open-command-palette.offline .offline {
+  display: block;
+}
+
+button.open-command-palette.offline .online {
+  display: none;
+}

@@ -10,11 +10,25 @@ import { DocumentSync } from "./document-sync.js";
 import { NoteEntry } from "./types.js";
 import { CommandPalette } from "./command-palette.js";
 
+const USER_KEY_ITEM_ID = "userKey";
+
 await main().catch((err) => {
   alert("ERROR: " + err);
 });
 
 async function main() {
+  let userKey = localStorage.getItem(USER_KEY_ITEM_ID);
+  if (userKey === null) {
+    if (crypto.randomUUID) {
+      userKey = crypto.randomUUID();
+    } else {
+      userKey = "xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx".replaceAll("x", () =>
+        ((Math.random() * 16) | 0).toString(16)
+      );
+    }
+    localStorage.setItem(USER_KEY_ITEM_ID, userKey);
+  }
+
   let editor: Editor | undefined;
   let currentNoteId: string | undefined;
   let currentDoc: Y.Doc | undefined;
@@ -23,10 +37,13 @@ async function main() {
   const sync = new DocumentSync();
 
   const localStateDoc = new Y.Doc();
-  documents.track(localStateDoc, "localState");
+  documents.track(localStateDoc, `${userKey}/localState`);
+
+  const sharedStateDoc = new Y.Doc();
+  documents.track(sharedStateDoc, `${userKey}/sharedState`);
+  sync.track(sharedStateDoc, `${userKey}sharedState`);
 
   const uiState = localStateDoc.getMap("uiState");
-
   const navigationHistory = localStateDoc.getArray<string>("navigationHistory");
   navigationHistory.observe(async () => {
     if (navigationHistory.length === 0) {
@@ -37,16 +54,24 @@ async function main() {
     await loadNote(currentNoteId);
   });
 
-  const sharedStateDoc = new Y.Doc();
-  documents.track(sharedStateDoc, "sharedState");
-  sync.track(sharedStateDoc, "sharedState");
-
   const notes = sharedStateDoc.getMap<NoteEntry>("notes");
 
   // setup command palette
   {
     const cp = new CommandPalette(notes, async (action) => {
-      if (action.id === "deleteCurrentDoc") {
+      if (action.id === "docOpen") {
+        navigationHistory.push([action.args.docId]);
+        return true;
+      }
+
+      if (action.id === "docMake") {
+        const noteId = Date.now().toString();
+        notes.set(noteId, new Y.Map([["title", action.args.docTitle]]));
+        navigationHistory.push([noteId]);
+        return true;
+      }
+
+      if (action.id === "docNuke") {
         if (currentNoteId === undefined) {
           alert("No note selected");
           return true;
@@ -73,34 +98,50 @@ async function main() {
         return true;
       }
 
-      if (action.id === "openDoc") {
-        navigationHistory.push([action.docId]);
+      if (action.id === "changeUserKey") {
+        const confirmed = confirm(
+          "Are you sure you want to change the user key?"
+        );
+        if (!confirmed) {
+          return true;
+        }
+
+        const newUserKey = prompt("New user key");
+        if (newUserKey === null || newUserKey === "") {
+          alert("No user key provided. Skipping action.");
+          return true;
+        }
+
+        localStorage.setItem(USER_KEY_ITEM_ID, newUserKey);
+        window.location.reload();
+
         return true;
       }
 
-      if (action.id === "createDoc") {
-        const noteId = Date.now().toString();
-        notes.set(noteId, new Y.Map([["title", action.docTitle]]));
-        navigationHistory.push([noteId]);
-        return true;
-      }
-
-      if (action.id === "testApi") {
+      if (action.id === "apiTest") {
         const response = await fetch("/api/hello");
         const text = await response.text();
         alert(text);
         return true;
       }
 
-      alert("Action not supported yet: " + (action as any).id);
+      action satisfies never;
       return false;
     });
 
-    document
-      .querySelector("button.open-command-palette")!
-      .addEventListener("click", () => {
-        cp.openDialog();
-      });
+    const commandPaletteButton = document.querySelector(
+      "button.open-command-palette"
+    )!;
+    window.addEventListener("online", () => {
+      commandPaletteButton.classList.remove("offline");
+    });
+    window.addEventListener("offline", () => {
+      commandPaletteButton.classList.add("offline");
+    });
+    commandPaletteButton.addEventListener("click", () => {
+      cp.openDialog();
+    });
+
     document.addEventListener("keydown", (e) => {
       if (e.ctrlKey && e.key === "p") {
         e.preventDefault();

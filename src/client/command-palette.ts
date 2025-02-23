@@ -1,23 +1,88 @@
 import * as Y from "yjs";
 import { NoteEntry } from "./types.js";
 
-type NoteEntryWithId = { id: string; meta: NoteEntry };
-
-export type Action =
-  | { id: "createDoc"; title: string; docTitle: string }
-  | { id: "testApi"; title: string }
-  | { id: "openDoc"; title: string; docId: string }
-  | { id: "deleteCurrentDoc"; title: string };
-
-const STATIC_ACTIONS: Record<string, Action> = {
-  TEST_API: { id: "testApi", title: ".api // Test API calls" },
-  DELETE_DOC: { id: "deleteCurrentDoc", title: ".del // Delete current doc" },
+type BaseAction = {
+  id: string;
+  title: string;
+  [key: string]: unknown;
 };
+
+type ActionTrigger = (ctx: {
+  input: string;
+  action: BaseAction;
+  activeActions: BaseAction[];
+  notes: Y.Map<NoteEntry>;
+}) => void;
+
+const COMMAND_ACTION_TRIGGER: ActionTrigger = (ctx) => {
+  if (
+    ctx.input.startsWith(".") &&
+    ctx.action.title.toLowerCase().includes(ctx.input)
+  ) {
+    ctx.activeActions.push(ctx.action);
+  }
+};
+
+export const ACTION_TRIGGERS = [
+  {
+    id: "docOpen",
+    title: ".open : %title%",
+    args: { docId: "" as string },
+    trigger: (ctx) => {
+      if (ctx.input.length < 2) {
+        return;
+      }
+
+      for (const [docId, meta] of ctx.notes.entries()) {
+        const title = (meta.get("title") as string) ?? "";
+        if (ctx.input === ".all" || title.toLowerCase().includes(ctx.input)) {
+          ctx.activeActions.push({
+            ...ctx.action,
+            title: ctx.action.title.replace("%title%", title),
+            args: { docId },
+          });
+        }
+      }
+    },
+  },
+  {
+    id: "docMake",
+    title: ".make : %title%",
+    args: { docTitle: "" as string },
+    trigger: (ctx) => {
+      if (ctx.input.startsWith(".") || ctx.input === "") {
+        return;
+      }
+
+      ctx.activeActions.push({
+        ...ctx.action,
+        title: ctx.action.title.replace("%title%", ctx.input),
+        args: { docTitle: ctx.input },
+      });
+    },
+  },
+  {
+    id: "docNuke",
+    title: ".nuke // delete current doc",
+    trigger: COMMAND_ACTION_TRIGGER,
+  },
+  {
+    id: "changeUserKey",
+    title: ".key // *DANGER* change user key",
+    trigger: COMMAND_ACTION_TRIGGER,
+  },
+  {
+    id: "apiTest",
+    title: ".api // test API calls",
+    trigger: COMMAND_ACTION_TRIGGER,
+  },
+] as const satisfies (BaseAction & { trigger: ActionTrigger })[];
+export type Action = (typeof ACTION_TRIGGERS)[number];
 
 export class CommandPalette {
   private open = false;
   private selectedActionIndex = 0;
-  private actions: Action[] = [STATIC_ACTIONS.TEST_API];
+  private actions: Action[] = [];
   private dialogElement!: HTMLDialogElement;
   private inputElement!: HTMLInputElement;
 
@@ -25,10 +90,6 @@ export class CommandPalette {
     private notes: Y.Map<NoteEntry>,
     private onAction: (action: Action, input: string) => Promise<boolean>
   ) {
-    this.initUI();
-  }
-
-  private initUI() {
     this.dialogElement = document.body.appendChild(
       document.createElement("dialog")
     );
@@ -53,16 +114,29 @@ export class CommandPalette {
     const list = this.dialogElement.appendChild(document.createElement("div"));
     list.classList.add("actions-list");
 
-    document.addEventListener("keydown", (e) => this.onKeyDown(e));
+    this.inputElement.addEventListener("keydown", (e) => this.onKeyDown(e));
   }
 
   private updateUI() {
-    this.updateActions();
+    this.actions = [];
+
+    const ctx = {
+      input: this.inputElement.value.toLowerCase(),
+      action: 0 as never as BaseAction,
+      activeActions: this.actions,
+      notes: this.notes,
+    };
+    for (const actionTrigger of ACTION_TRIGGERS) {
+      ctx.action = actionTrigger;
+      actionTrigger.trigger(ctx);
+    }
 
     const list = document.querySelector(".actions-list")!;
     list.innerHTML = "";
 
-    this.actions.forEach((action, i) => {
+    for (let i = 0; i < this.actions.length; i++) {
+      const action = this.actions[i];
+
       const item = list.appendChild(document.createElement("div"));
       item.classList.add("action-item");
       item.textContent = action.title;
@@ -78,53 +152,6 @@ export class CommandPalette {
           this.closeDialog();
         }
       });
-    });
-  }
-
-  private async updateActions() {
-    this.actions = [];
-
-    const input = this.inputElement.value.toLowerCase();
-
-    if (input.length >= 2) {
-      const matchingDocs: NoteEntryWithId[] = [];
-      for (const [id, meta] of this.notes.entries()) {
-        if (input === ".all") {
-          matchingDocs.push({ id, meta });
-          continue;
-        }
-
-        const title = (meta.get("title") as string) ?? "";
-        if (title.toLowerCase().includes(input)) {
-          matchingDocs.push({ id, meta });
-        }
-      }
-
-      const openDocsActions = matchingDocs.map(
-        (doc) =>
-          ({
-            id: "openDoc",
-            title: `.open : ${doc.meta.get("title") ?? ""}`,
-            docId: doc.id,
-          } as Action)
-      );
-      this.actions.push(...openDocsActions);
-    }
-
-    if (input.startsWith(".")) {
-      for (const staticAction of Object.values(STATIC_ACTIONS)) {
-        if (staticAction.title.toLowerCase().includes(input)) {
-          this.actions.push(staticAction);
-        }
-      }
-    }
-
-    if (!input.startsWith(".") && input !== "") {
-      this.actions.push({
-        id: "createDoc",
-        title: `.make : ${this.inputElement.value}`,
-        docTitle: this.inputElement.value,
-      });
     }
   }
 
@@ -135,28 +162,39 @@ export class CommandPalette {
 
     if (e.key === "ArrowUp") {
       e.preventDefault();
+
       this.selectedActionIndex = Math.max(0, this.selectedActionIndex - 1);
+
       return this.updateUI();
     }
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
+
       this.selectedActionIndex = Math.min(
         this.actions.length - 1,
         this.selectedActionIndex + 1
       );
+
       return this.updateUI();
     }
 
     if (e.key === "Enter") {
       e.preventDefault();
+
       const action = this.actions[this.selectedActionIndex];
       const shouldClose = await this.onAction(action, this.inputElement.value);
       if (shouldClose) {
-        this.closeDialog();
-      } else {
-        this.updateUI();
+        return this.closeDialog();
       }
+
+      return this.updateUI();
+    }
+
+    if (e.key === "Escape") {
+      e.preventDefault();
+
+      return this.closeDialog();
     }
   }
 
