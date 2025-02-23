@@ -43,3 +43,7 @@ button {
 button:hover {
   background-color: var(--highlight);
 }
+
+* {
+  scrollbar-color: var(--background-secondary) var(--background);
+}

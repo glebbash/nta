@@ -1,9 +1,13 @@
-import { Editor } from "@tiptap/core";
+import { Editor, getSchema } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import TextStyle from "@tiptap/extension-text-style";
 import Collaboration from "@tiptap/extension-collaboration";
 import Document from "@tiptap/extension-document";
+import { DOMParser } from "@tiptap/pm/model";
 import * as Y from "yjs";
+import { prosemirrorJSONToYXmlFragment } from "y-prosemirror";
+// @ts-ignore
+import { parseHTML } from "hostic-dom";
 
 import { DocumentStore } from "./document-store.js";
 import { DocumentSync } from "./document-sync.js";
@@ -114,6 +118,47 @@ async function main() {
 
         localStorage.setItem(USER_KEY_ITEM_ID, newUserKey);
         window.location.reload();
+
+        return true;
+      }
+
+      if (action.id === "importFromJson") {
+        const backupFile = await getUploadedJsonFile<
+          Record<string, { meta: Record<string, unknown>; content: string }>
+        >();
+        if (backupFile === null) {
+          alert("Invalid or missing file. Skipping action.");
+          return true;
+        }
+
+        for (const [docId, { meta, content }] of Object.entries(backupFile)) {
+          notes.set(docId, new Y.Map(Object.entries(meta)));
+          const doc = await htmlToYDoc(content);
+          await documents.createDoc("notes/" + docId, doc);
+          doc.destroy();
+        }
+
+        alert("Loaded");
+
+        return true;
+      }
+
+      if (action.id === "loadContentFromHtml") {
+        if (editor === undefined || currentNoteId === undefined) {
+          alert("Create an empty note first");
+          return true;
+        }
+
+        const htmlContent = prompt("HTML content");
+        if (!htmlContent) {
+          alert("No HTML provided. Skipping action.");
+          return true;
+        }
+
+        const doc = await htmlToYDoc(htmlContent);
+        await documents.createDoc("notes/" + currentNoteId, doc);
+        doc.destroy();
+        await loadNote(currentNoteId);
 
         return true;
       }
@@ -381,4 +426,49 @@ function tiptapSingleH1Doc(title: string) {
       },
     ],
   };
+}
+
+async function getUploadedJsonFile<T = unknown>(): Promise<T | null> {
+  return new Promise((resolve) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+
+    input.addEventListener("change", (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!file) return resolve(null);
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const jsonString = e.target?.result as string;
+          resolve(JSON.parse(jsonString));
+        } catch {
+          console.error("Invalid JSON file");
+          resolve(null);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    input.click();
+  });
+}
+
+const schema = getSchema([StarterKit]);
+
+async function htmlToYDoc(html: string): Promise<Y.Doc> {
+  const dom = parseHTML(html);
+  const pmJson = DOMParser.fromSchema(schema).parse(dom).toJSON();
+
+  const ydoc = new Y.Doc();
+  const yXmlFragment = ydoc.getXmlFragment("default");
+  prosemirrorJSONToYXmlFragment(schema, pmJson, yXmlFragment);
+
+  console.log({
+    pmJson,
+    result: ydoc.getXmlFragment("default").toJSON(),
+  });
+
+  return ydoc;
 }

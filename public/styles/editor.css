@@ -1,5 +1,6 @@
 :root {
   --h-padding: 64px;
+  --code-background: black;
 }
 
 .editor-title-bar {
@@ -25,7 +26,6 @@
   padding: 0 var(--h-padding);
   overflow: auto;
   white-space: pre-wrap;
-  scrollbar-color: var(--background-secondary) var(--background);
 }
 
 @media (max-width: 768px) {
@@ -124,17 +124,17 @@ button.show-properties.active .close {
 
 /* Code and preformatted text styles */
 .tiptap code {
-  background-color: var(--purple-light);
+  background-color: var(--code-background);
   border-radius: 0.4rem;
-  color: var(--black);
+  color: var(--font-color);
   font-size: 0.85rem;
   padding: 0.25em 0.3em;
 }
 
 .tiptap pre {
-  background: var(--black);
+  background: var(--code-background);
   border-radius: 0.5rem;
-  color: var(--white);
+  color: var(--font-color);
   font-family: "Noto Sans Mono", "JetBrainsMono", monospace;
   margin: 1.5rem 0;
   padding: 0.75rem 1rem;
@@ -148,14 +148,14 @@ button.show-properties.active .close {
 }
 
 .tiptap blockquote {
-  border-left: 3px solid var(--gray-3);
+  border-left: 3px solid var(--background-secondary);
   margin: 1.5rem 0;
   padding-left: 1rem;
 }
 
 .tiptap hr {
   border: none;
-  border-top: 1px solid var(--gray-2);
+  border-top: 1px solid var(--background-secondary);
   margin: 2rem 0;
 }
 

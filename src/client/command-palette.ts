@@ -67,6 +67,16 @@ export const ACTION_TRIGGERS = [
     trigger: COMMAND_ACTION_TRIGGER,
   },
   {
+    id: "importFromJson",
+    title: ".import // import notes from JSON backup",
+    trigger: COMMAND_ACTION_TRIGGER,
+  },
+  {
+    id: "loadContentFromHtml",
+    title: ".load-html // (debug) load HTML into current document",
+    trigger: COMMAND_ACTION_TRIGGER,
+  },
+  {
     id: "changeUserKey",
     title: ".key // *DANGER* change user key",
     trigger: COMMAND_ACTION_TRIGGER,

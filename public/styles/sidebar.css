@@ -2,7 +2,8 @@
   background-color: var(--background-secondary);
   width: 0;
   min-width: 0;
-  overflow: clip;
+  overflow-x: clip;
+  overflow-y: auto;
   transition: all 0.3s ease;
 }
 
