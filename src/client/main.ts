@@ -7,8 +7,7 @@ import * as Y from "yjs";
 
 import { DocumentStore } from "./document-store.js";
 import { DocumentSync } from "./document-sync.js";
-
-type NoteEntry = Y.Map<unknown>;
+import { NoteEntry } from "./types.js";
 
 await main().catch((err) => {
   alert("ERROR: " + err);

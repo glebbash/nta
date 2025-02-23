@@ -69,6 +69,37 @@ export default defineConfig({
           },
         ],
       },
+      workbox: {
+        navigateFallbackDenylist: [/^\/auth/, /^\/api/],
+        // https://vite-pwa-org.netlify.app/workbox/generate-sw.html#cache-external-resources
+        runtimeCaching: [
+          cacheEntry(
+            /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            "google-fonts-cache"
+          ),
+          cacheEntry(
+            /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            "gstatic-fonts-cache"
+          ),
+        ],
+      },
     }),
   ],
 });
+
+function cacheEntry(urlPattern: RegExp, cacheName: string) {
+  return {
+    urlPattern,
+    handler: "CacheFirst" as const,
+    options: {
+      cacheName,
+      expiration: {
+        maxEntries: 10,
+        maxAgeSeconds: 60 * 60 * 24 * 365, // 365 days
+      },
+      cacheableResponse: {
+        statuses: [0, 200],
+      },
+    },
+  };
+}
