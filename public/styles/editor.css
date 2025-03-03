@@ -166,3 +166,7 @@ button.show-properties.active .close {
   height: 0;
   pointer-events: none;
 }
+
+.tiptap a {
+  color: var(--font-color-secondary);
+}
