@@ -304,7 +304,7 @@ async function main() {
   }
 
   // setup properties view
-  {
+  if (/* TODO: enable when I will be adding properties support */ false) {
     const docPropertiesView = document.querySelector<HTMLElement>(
       ".doc-properties-content"
     )!;
