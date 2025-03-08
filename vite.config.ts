@@ -15,6 +15,7 @@ export default defineConfig({
         name: "NTA",
         short_name: "NTA",
         description: "Note Taking App",
+        background_color: "#000000",
         theme_color: "#000000",
         icons: [
           {
