@@ -11,6 +11,9 @@ export type DocumentSyncSetup = {
 };
 
 export class DocumentSync {
+  public status: "connected" | "connecting" | "disconnected" = "disconnected";
+  public onStatus?: () => void;
+
   private socket?: HocuspocusProviderWebsocket;
 
   constructor(private setup?: DocumentSyncSetup) {
@@ -20,6 +23,10 @@ export class DocumentSync {
 
     this.socket = new HocuspocusProviderWebsocket({
       url: this.setup.url,
+      onStatus: ({ status }) => {
+        this.status = status;
+        this.onStatus?.();
+      },
     });
   }
 
@@ -33,6 +40,10 @@ export class DocumentSync {
       document: doc,
       websocketProvider: this.socket!,
       token: this.setup.token,
+      onAuthenticationFailed: () => {
+        this.status = "disconnected";
+        this.onStatus?.();
+      },
     });
   }
 }

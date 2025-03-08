@@ -215,12 +215,14 @@ async function main() {
     const commandPaletteButton = document.querySelector(
       "button.open-command-palette"
     )!;
-    window.addEventListener("online", () => {
-      commandPaletteButton.classList.remove("offline");
-    });
-    window.addEventListener("offline", () => {
-      commandPaletteButton.classList.add("offline");
-    });
+    remote.onStatus = () => {
+      if (remote.status === "connected") {
+        commandPaletteButton.classList.remove("offline");
+      } else {
+        commandPaletteButton.classList.add("offline");
+      }
+    };
+    remote.onStatus?.();
     commandPaletteButton.addEventListener("click", () => {
       cp.openDialog();
     });
