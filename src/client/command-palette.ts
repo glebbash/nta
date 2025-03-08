@@ -82,6 +82,11 @@ export const ACTION_TRIGGERS = [
     trigger: COMMAND_ACTION_TRIGGER,
   },
   {
+    id: "sync",
+    title: ".sync // setup sync",
+    trigger: COMMAND_ACTION_TRIGGER,
+  },
+  {
     id: "apiTest",
     title: ".api // test API calls",
     trigger: COMMAND_ACTION_TRIGGER,

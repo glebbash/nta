@@ -1,21 +1,19 @@
-import { Editor, getSchema } from "@tiptap/core";
+import * as Y from "yjs";
+import { prosemirrorJSONToYXmlFragment } from "y-prosemirror";
+import { Editor, generateJSON, getSchema } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import TextStyle from "@tiptap/extension-text-style";
 import Collaboration from "@tiptap/extension-collaboration";
 import Document from "@tiptap/extension-document";
-import { DOMParser } from "@tiptap/pm/model";
-import * as Y from "yjs";
-import { prosemirrorJSONToYXmlFragment } from "y-prosemirror";
-// @ts-ignore
-import { parseHTML } from "hostic-dom";
-
-import { DocumentStore } from "./document-store.js";
-import { DocumentSync } from "./document-sync.js";
-import { NoteEntry } from "./types.js";
-import { CommandPalette } from "./command-palette.js";
 import Link from "@tiptap/extension-link";
 
+import { DocumentStore } from "./document-store.js";
+import { DocumentSync, DocumentSyncSetup } from "./document-sync.js";
+import { NoteEntry } from "./types.js";
+import { CommandPalette } from "./command-palette.js";
+
 const USER_KEY_ITEM_ID = "userKey";
+const SYNC_SETUP_ITEM_ID = "syncSetup";
 const TIPTAP_EXTENSIONS = [
   Link.configure({
     HTMLAttributes: { rel: null, target: null },
@@ -37,25 +35,34 @@ async function main() {
 
   let userKey = localStorage.getItem(USER_KEY_ITEM_ID);
   if (userKey === null) {
-    if (crypto.randomUUID) {
-      userKey = crypto.randomUUID();
-    } else {
-      userKey = "xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx".replaceAll("x", () =>
-        ((Math.random() * 16) | 0).toString(16)
-      );
-    }
+    userKey = uuid();
     localStorage.setItem(USER_KEY_ITEM_ID, userKey);
   }
 
-  const documents = await DocumentStore.load("nta");
-  const sync = new DocumentSync();
+  const local = await DocumentStore.load("nta");
 
-  const localStateDoc = new Y.Doc();
-  documents.track(localStateDoc, `${userKey}/localState`);
+  let setup: DocumentSyncSetup | undefined;
+  if (localStorage.getItem(SYNC_SETUP_ITEM_ID)) {
+    const [url, token] = localStorage.getItem(SYNC_SETUP_ITEM_ID)!.split("::");
+    setup = { type: "hocuspocus", url, token };
+  }
+  const remote = new DocumentSync(setup);
 
   const sharedStateDoc = new Y.Doc();
-  documents.track(sharedStateDoc, `${userKey}/sharedState`);
-  sync.track(sharedStateDoc, `${userKey}sharedState`);
+  local.track(sharedStateDoc, `${userKey}/sharedState`);
+  remote.track(sharedStateDoc, `${userKey}/sharedState`);
+  sharedStateDoc.on("subdocs", ({ loaded, added, removed }) => {
+    for (const doc of loaded) {
+      local.track(doc, `${userKey}/docs/${doc.guid}`);
+      remote.track(doc, `${userKey}/docs/${doc.guid}`);
+    }
+
+    // TODO: what to do with these?
+    [added, removed];
+  });
+
+  const localStateDoc = new Y.Doc();
+  local.track(localStateDoc, `${userKey}/localState`);
 
   const uiState = localStateDoc.getMap("uiState");
   const navigationHistory = localStateDoc.getArray<string>("navigationHistory");
@@ -65,7 +72,7 @@ async function main() {
     }
 
     currentNoteId = navigationHistory.get(navigationHistory.length - 1);
-    await loadNote(currentNoteId);
+    await loadNote();
   });
 
   // handle internal links
@@ -88,8 +95,14 @@ async function main() {
       }
 
       if (action.id === "docMake") {
-        const noteId = Date.now().toString();
-        notes.set(noteId, new Y.Map([["title", action.args.docTitle]]));
+        const noteId = uuid();
+        notes.set(
+          noteId,
+          new Y.Map([
+            ["title", action.args.docTitle],
+            ["content", new Y.Doc({ guid: noteId, autoLoad: true })],
+          ])
+        );
         navigationHistory.push([noteId]);
         return true;
       }
@@ -108,7 +121,6 @@ async function main() {
         );
         if (confirmed) {
           editor?.destroy();
-          await documents.deleteDoc("notes/" + currentNoteId);
           notes.delete(currentNoteId);
           navigationHistory.doc!.transact(() => {
             for (let i = navigationHistory.length - 1; i >= 0; i--) {
@@ -141,6 +153,21 @@ async function main() {
         return true;
       }
 
+      if (action.id === "sync") {
+        const syncSetup = prompt(
+          "Enter HocusPocus connection string in the following format: `<url>::<token>`.\n" +
+            "TipTap Cloud the <url> part is: `wss://<app-id>.collab.tiptap.cloud`"
+        );
+        if (syncSetup === null || syncSetup === "") {
+          alert("No API key provided. Skipping action.");
+          return true;
+        }
+
+        localStorage.setItem(SYNC_SETUP_ITEM_ID, syncSetup);
+        window.location.reload();
+        return true;
+      }
+
       if (action.id === "importFromJson") {
         const backupFile = await getUploadedJsonFile<
           Record<string, { meta: Record<string, unknown>; content: string }>
@@ -151,10 +178,12 @@ async function main() {
         }
 
         for (const [docId, { meta, content }] of Object.entries(backupFile)) {
-          notes.set(docId, new Y.Map(Object.entries(meta)));
-          const doc = await htmlToYDoc(content);
-          await documents.createDoc("notes/" + docId, doc);
-          doc.destroy();
+          const doc = new Y.Doc({ autoLoad: true });
+          await loadYDocContentFromHtml(doc, content);
+          notes.set(
+            docId,
+            new Y.Map([...Object.entries(meta), ["content", doc]])
+          );
         }
 
         alert("Loaded");
@@ -174,9 +203,7 @@ async function main() {
           return true;
         }
 
-        const doc = await htmlToYDoc(htmlContent);
-        await documents.createDoc("notes/" + currentNoteId, doc);
-        window.location.reload();
+        await loadYDocContentFromHtml(currentDoc!, htmlContent);
 
         return true;
       }
@@ -373,18 +400,12 @@ async function main() {
     });
   }
 
-  async function loadNote(noteId: string) {
+  async function loadNote() {
     if (editor !== undefined) {
       editor.destroy();
     }
 
-    if (currentDoc !== undefined) {
-      currentDoc.destroy();
-    }
-
-    currentDoc = new Y.Doc();
-    await documents.track(currentDoc, "notes/" + noteId);
-    sync.track(currentDoc, "notes/" + noteId);
+    currentDoc = notes.get(currentNoteId!)!.get("content") as Y.Doc;
 
     editor = new Editor({
       element: document.querySelector(".editor")!,
@@ -472,13 +493,20 @@ async function getUploadedJsonFile<T = unknown>(): Promise<T | null> {
   });
 }
 
-async function htmlToYDoc(html: string): Promise<Y.Doc> {
-  const dom = parseHTML(html);
-  const pmJson = DOMParser.fromSchema(TIPTAP_SCHEMA).parse(dom).toJSON();
+async function loadYDocContentFromHtml(ydoc: Y.Doc, html: string) {
+  const contentJson = generateJSON(html, TIPTAP_EXTENSIONS);
 
-  const ydoc = new Y.Doc();
-  const yXmlFragment = ydoc.getXmlFragment("default");
-  prosemirrorJSONToYXmlFragment(TIPTAP_SCHEMA, pmJson, yXmlFragment);
+  const contentFragment = ydoc.getXmlFragment("default");
+  prosemirrorJSONToYXmlFragment(TIPTAP_SCHEMA, contentJson, contentFragment);
+}
 
-  return ydoc;
+function uuid() {
+  if (crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+
+  // for unsecure contexts
+  return "xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx".replaceAll("x", () =>
+    ((Math.random() * 16) | 0).toString(16)
+  );
 }

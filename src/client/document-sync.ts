@@ -1,13 +1,38 @@
-import { WebrtcProvider } from "y-webrtc";
 import * as Y from "yjs";
+import {
+  HocuspocusProvider,
+  HocuspocusProviderWebsocket,
+} from "@hocuspocus/provider";
 
-const signaling = ["wss://yjs-signaling-69.fly.dev/"];
+export type DocumentSyncSetup = {
+  type: "hocuspocus";
+  url: string;
+  token: string;
+};
 
 export class DocumentSync {
-  public static ORIGIN = this;
+  private socket?: HocuspocusProviderWebsocket;
 
-  // TODO: use custom provider to also sync changes of unloaded documents
+  constructor(private setup?: DocumentSyncSetup) {
+    if (!this.setup) {
+      return;
+    }
+
+    this.socket = new HocuspocusProviderWebsocket({
+      url: this.setup.url,
+    });
+  }
+
   track(doc: Y.Doc, docId: string) {
-    return new WebrtcProvider(docId, doc, { signaling });
+    if (!this.setup) {
+      return;
+    }
+
+    return new HocuspocusProvider({
+      name: docId,
+      document: doc,
+      websocketProvider: this.socket!,
+      token: this.setup.token,
+    });
   }
 }
