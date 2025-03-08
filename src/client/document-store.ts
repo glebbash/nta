@@ -16,7 +16,6 @@ export class DocumentStore {
 
   private constructor(private db: IDBPDatabase<LocalSyncDBSchema>) {}
 
-  // TODO: try loading db lazily, and check the feel
   static async load(dbName: string) {
     // make sure the browser doesn't clear the storage
     if (navigator.storage && navigator.storage.persist) {
