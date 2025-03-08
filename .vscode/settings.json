@@ -3,5 +3,5 @@
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "deno.enable": false
+  "deno.enablePaths": ["nta-server"]
 }
