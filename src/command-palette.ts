@@ -86,11 +86,6 @@ export const ACTION_TRIGGERS = [
     title: ".sync // setup sync",
     trigger: COMMAND_ACTION_TRIGGER,
   },
-  {
-    id: "apiTest",
-    title: ".api // test API calls",
-    trigger: COMMAND_ACTION_TRIGGER,
-  },
 ] as const satisfies (BaseAction & { trigger: ActionTrigger })[];
 export type Action = (typeof ACTION_TRIGGERS)[number];
 

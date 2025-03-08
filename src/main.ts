@@ -208,13 +208,6 @@ async function main() {
         return true;
       }
 
-      if (action.id === "apiTest") {
-        const response = await fetch("/api/hello");
-        const text = await response.text();
-        alert(text);
-        return true;
-      }
-
       action satisfies never;
       return false;
     });
