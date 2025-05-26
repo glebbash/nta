@@ -82,8 +82,18 @@ export const ACTION_TRIGGERS = [
     trigger: COMMAND_ACTION_TRIGGER,
   },
   {
+    id: "exportUserKey",
+    title: ".export-key // export user key",
+    trigger: COMMAND_ACTION_TRIGGER,
+  },
+  {
     id: "sync",
     title: ".sync // setup sync",
+    trigger: COMMAND_ACTION_TRIGGER,
+  },
+  {
+    id: "exportSyncConfig",
+    title: ".export-sync // export sync config",
     trigger: COMMAND_ACTION_TRIGGER,
   },
 ] as const satisfies (BaseAction & { trigger: ActionTrigger })[];

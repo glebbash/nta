@@ -109,7 +109,7 @@ async function main() {
 
       if (action.id === "docNuke") {
         if (currentNoteId === undefined) {
-          alert("No note selected");
+          alert("ERROR: No note selected. Skipping action.");
           return true;
         }
 
@@ -143,12 +143,25 @@ async function main() {
 
         const newUserKey = prompt("New user key");
         if (newUserKey === null || newUserKey === "") {
-          alert("No user key provided. Skipping action.");
+          alert("ERROR: No user key provided. Skipping action.");
           return true;
         }
 
         localStorage.setItem(USER_KEY_ITEM_ID, newUserKey);
         window.location.reload();
+
+        return true;
+      }
+
+      if (action.id === "exportUserKey") {
+        try {
+          await navigator.clipboard.writeText(userKey);
+        } catch {
+          alert("ERROR: Clipboard access required. Enable and try again.");
+          return true;
+        }
+
+        alert("User key copied to clipboard.");
 
         return true;
       }
@@ -159,7 +172,7 @@ async function main() {
             "TipTap Cloud the <url> part is: `wss://<app-id>.collab.tiptap.cloud`"
         );
         if (syncSetup === null || syncSetup === "") {
-          alert("No API key provided. Skipping action.");
+          alert("ERROR: No API key provided. Skipping action.");
           return true;
         }
 
@@ -168,12 +181,31 @@ async function main() {
         return true;
       }
 
+      if (action.id === "exportSyncConfig") {
+        const syncSetup = localStorage.getItem(SYNC_SETUP_ITEM_ID);
+        if (syncSetup === null) {
+          alert("ERROR: No sync configured. Skipping action.");
+          return true;
+        }
+
+        try {
+          await navigator.clipboard.writeText(syncSetup);
+        } catch {
+          alert("ERROR: Clipboard access required. Enable and try again.");
+          return true;
+        }
+
+        alert("Sync config copied to clipboard.");
+
+        return true;
+      }
+
       if (action.id === "importFromJson") {
         const backupFile = await getUploadedJsonFile<
           Record<string, { meta: Record<string, unknown>; content: string }>
         >();
         if (backupFile === null) {
-          alert("Invalid or missing file. Skipping action.");
+          alert("ERROR: Invalid or missing file. Skipping action.");
           return true;
         }
 
@@ -193,13 +225,15 @@ async function main() {
 
       if (action.id === "loadContentFromHtml") {
         if (editor === undefined || currentNoteId === undefined) {
-          alert("Create an empty note first");
+          alert(
+            "ERROR: No note selected. Create an empty note first and retry."
+          );
           return true;
         }
 
         const htmlContent = prompt("HTML content");
         if (!htmlContent) {
-          alert("No HTML provided. Skipping action.");
+          alert("ERROR: No HTML provided. Skipping action.");
           return true;
         }
 
