@@ -22,7 +22,6 @@
   },
   "devDependencies": {
     "cheerio": "^1.0.0",
-    "jsonwebtoken": "^9.0.2",
     "marked": "^15.0.7",
     "typescript": "^5.8.2",
     "vite": "^6.1.1",
