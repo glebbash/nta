@@ -51,14 +51,11 @@ async function main() {
   const sharedStateDoc = new Y.Doc();
   local.track(sharedStateDoc, `${userKey}/sharedState`);
   remote.track(sharedStateDoc, `${userKey}/sharedState`);
-  sharedStateDoc.on("subdocs", ({ loaded, added, removed }) => {
-    for (const doc of loaded) {
+  sharedStateDoc.on("subdocs", (subDocs) => {
+    for (const doc of subDocs.loaded) {
       local.track(doc, `${userKey}/docs/${doc.guid}`);
       remote.track(doc, `${userKey}/docs/${doc.guid}`);
     }
-
-    // TODO: what to do with these?
-    [added, removed];
   });
 
   const localStateDoc = new Y.Doc();
@@ -101,7 +98,7 @@ async function main() {
           new Y.Map([
             ["title", action.args.docTitle],
             ["content", new Y.Doc({ guid: noteId, autoLoad: true })],
-          ])
+          ]),
         );
         navigationHistory.push([noteId]);
         return true;
@@ -117,7 +114,7 @@ async function main() {
           (notes.get(currentNoteId)?.get("title") as string) ?? "<untitled>";
 
         const confirmed = confirm(
-          `Are you sure you want to delete ${noteTitle}?`
+          `Are you sure you want to delete ${noteTitle}?`,
         );
         if (confirmed) {
           editor?.destroy();
@@ -135,7 +132,7 @@ async function main() {
 
       if (action.id === "changeUserKey") {
         const confirmed = confirm(
-          "Are you sure you want to change the user key?"
+          "Are you sure you want to change the user key?",
         );
         if (!confirmed) {
           return true;
@@ -169,7 +166,7 @@ async function main() {
       if (action.id === "sync") {
         const syncSetup = prompt(
           "Enter HocusPocus connection string in the following format: `<url>::<token>`.\n" +
-            "TipTap Cloud the <url> part is: `wss://<app-id>.collab.tiptap.cloud`"
+            "TipTap Cloud the <url> part is: `wss://<app-id>.collab.tiptap.cloud`",
         );
         if (syncSetup === null || syncSetup === "") {
           alert("ERROR: No API key provided. Skipping action.");
@@ -201,9 +198,10 @@ async function main() {
       }
 
       if (action.id === "importFromJson") {
-        const backupFile = await getUploadedJsonFile<
-          Record<string, { meta: Record<string, unknown>; content: string }>
-        >();
+        const backupFile =
+          await getUploadedJsonFile<
+            Record<string, { meta: Record<string, unknown>; content: string }>
+          >();
         if (backupFile === null) {
           alert("ERROR: Invalid or missing file. Skipping action.");
           return true;
@@ -214,7 +212,7 @@ async function main() {
           await loadYDocContentFromHtml(doc, content);
           notes.set(
             docId,
-            new Y.Map([...Object.entries(meta), ["content", doc]])
+            new Y.Map([...Object.entries(meta), ["content", doc]]),
           );
         }
 
@@ -226,7 +224,7 @@ async function main() {
       if (action.id === "loadContentFromHtml") {
         if (editor === undefined || currentNoteId === undefined) {
           alert(
-            "ERROR: No note selected. Create an empty note first and retry."
+            "ERROR: No note selected. Create an empty note first and retry.",
           );
           return true;
         }
@@ -247,7 +245,7 @@ async function main() {
     });
 
     const commandPaletteButton = document.querySelector(
-      "button.open-command-palette"
+      "button.open-command-palette",
     )!;
     remote.onStatus = () => {
       if (remote.status === "connected") {
@@ -309,7 +307,7 @@ async function main() {
 
     let sidebarToggleCount = 0;
     const sidebarOpenButton = document.querySelector(
-      "button.collapse-sidebar"
+      "button.collapse-sidebar",
     )!;
     sidebarOpenButton.addEventListener("click", () => {
       uiState.set("sidebarOpen", !uiState.get("sidebarOpen"));
@@ -359,36 +357,6 @@ async function main() {
     }
   }
 
-  // setup properties view
-  if (/* TODO: enable when I will be adding properties support */ false) {
-    const docPropertiesView = document.querySelector<HTMLElement>(
-      ".doc-properties-content"
-    )!;
-
-    let propertiesToggleCount = 0;
-    const showPropertiesButton = document.querySelector(
-      "button.show-properties"
-    )!;
-    showPropertiesButton.addEventListener("click", () => {
-      uiState.set("propertiesOpen", !uiState.get("propertiesOpen"));
-    });
-    uiState.observe(() => {
-      if (uiState.get("propertiesOpen") ?? false) {
-        showPropertiesButton.classList.add("active");
-        docPropertiesView.style.height = docPropertiesView.scrollHeight + "px";
-      } else {
-        showPropertiesButton.classList.remove("active");
-        docPropertiesView.style.height = null as never;
-      }
-
-      if (propertiesToggleCount++ === 0) {
-        docPropertiesView.classList.add("no-transition");
-        docPropertiesView.offsetHeight;
-        docPropertiesView.classList.remove("no-transition");
-      }
-    });
-  }
-
   if (isMobile()) {
     // fix for chrome android
     window.addEventListener("resize", () => {
@@ -397,7 +365,7 @@ async function main() {
 
     setupOverKeyboardBar(
       document.querySelector(".over-keyboard-bar")!,
-      (element) => element.classList.contains("tiptap")
+      (element) => element.classList.contains("tiptap"),
     );
     document.querySelector("#tab-btn")!.addEventListener("click", () => {
       if (editor === undefined) {
@@ -448,7 +416,7 @@ async function main() {
 
 function setupOverKeyboardBar(
   bar: HTMLElement,
-  shouldOpenFor: (element: Element) => boolean
+  shouldOpenFor: (element: Element) => boolean,
 ) {
   window.visualViewport!.addEventListener("resize", updateOverlay);
   window.visualViewport!.addEventListener("scroll", updateOverlay);
@@ -477,7 +445,7 @@ function isMobile() {
   return (
     window.innerWidth < 768 &&
     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
+      navigator.userAgent,
     )
   );
 }
@@ -536,6 +504,6 @@ function uuid() {
 
   // for unsecure contexts
   return "xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx".replaceAll("x", () =>
-    ((Math.random() * 16) | 0).toString(16)
+    ((Math.random() * 16) | 0).toString(16),
   );
 }
