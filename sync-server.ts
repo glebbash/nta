@@ -12,4 +12,4 @@ const server = new Server({
   },
 });
 
-server.listen(6969);
+server.listen(Number(process.env.PORT));

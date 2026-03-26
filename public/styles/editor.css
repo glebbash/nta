@@ -10,17 +10,6 @@
   padding-bottom: 0px;
 }
 
-.doc-properties {
-  margin: 0 var(--h-padding);
-  border: 1px solid var(--background-secondary);
-  overflow: clip;
-}
-
-.doc-properties-content {
-  height: 0;
-  transition: all 0.3s ease;
-}
-
 .editor {
   flex-grow: 1;
   padding: 0 var(--h-padding);
@@ -40,30 +29,6 @@
     padding: 0 16px;
     padding-bottom: 80px;
   }
-}
-
-button.show-properties {
-  margin: 12px 0;
-  margin-left: auto;
-}
-
-button.show-properties .close {
-  display: none;
-}
-
-button.show-properties.active .open {
-  display: none;
-}
-
-button.show-properties.active .close {
-  display: block;
-}
-
-.edit-area {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  overflow-x: hidden;
 }
 
 .tiptap {
