@@ -60,7 +60,7 @@ I tried a bunch of different hosting providers and setups, the one I ended up wi
 **Step 1: Clone the repo and install deps:**
 
 ```bash
-git clone https://github.com/glebbash/nta && npm i
+git clone https://github.com/glebbash/nta --depth 1 && npm i
 ```
 
 **Step 2: Configure the server by creating a `data/.env`:**
