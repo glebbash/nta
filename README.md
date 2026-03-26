@@ -2,6 +2,8 @@
 
 A simple note-taking app with a self-hosted sync & backup server.
 
+![screenshot](app-screenshot.png)
+
 ## Features
 
 - **Simple Interface**: Minimal design focused on writing.
@@ -52,8 +54,8 @@ You can host it on Fly.io (for free) and it will just work, but you'll need to w
 I tried a bunch of different hosting providers and setups, the one I ended up with uses a VPS (that I already had for other projects) to have easy access to notes data and a domain from Cloudflare with their free SSL proxy in front of the server. A bunch of domain registrars offer free DNS hosting with SSL proxy, so you can just buy a cheap domain and use that.
 
 > Prerequisites:
-> - Node.js 24+ (for native TypeScript execution).
-> - A Linux system with systemd (for the server setup).
+> - Node.js 24+ using NVM
+> - A Linux system with systemd
 
 **Step 1: Clone the repo and install deps:**
 
