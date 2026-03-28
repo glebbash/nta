@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite dev --host",
     "start": "vite start",
-    "build": "vite build"
+    "build": "vite build",
+    "deploy": "npm run build && wrangler deploy",
+    "preview": "npm run build && wrangler dev"
   },
   "dependencies": {
     "@hocuspocus/extension-sqlite": "^3.4.4",
@@ -23,11 +25,13 @@
     "yjs": "^13.6.23"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.30.2",
     "@types/node": "^25.5.0",
     "cheerio": "^1.0.0",
     "marked": "^15.0.7",
     "typescript": "^5.8.2",
     "vite": "^6.1.1",
-    "vite-plugin-pwa": "^0.21.1"
+    "vite-plugin-pwa": "^0.21.1",
+    "wrangler": "^4.78.0"
   }
 }
