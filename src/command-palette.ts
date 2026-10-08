@@ -87,6 +87,11 @@ export const ACTION_TRIGGERS = [
     trigger: COMMAND_ACTION_TRIGGER,
   },
   {
+    id: "fontScale",
+    title: ".font-scale // change font size (percentage)",
+    trigger: COMMAND_ACTION_TRIGGER,
+  },
+  {
     id: "sync",
     title: ".sync // setup sync",
     trigger: COMMAND_ACTION_TRIGGER,
