@@ -14,6 +14,7 @@ import { CommandPalette } from "./command-palette.js";
 
 const USER_KEY_ITEM_ID = "userKey";
 const SYNC_SETUP_ITEM_ID = "syncSetup";
+const FONT_SCALE_ITEM_ID = "fontScale";
 const TIPTAP_EXTENSIONS = [
   Link.configure({
     HTMLAttributes: { rel: null, target: null },
@@ -38,6 +39,11 @@ async function main() {
     userKey = uuid();
     localStorage.setItem(USER_KEY_ITEM_ID, userKey);
   }
+
+  const applyFontScale = (scale: number) => {
+    document.documentElement.style.fontSize = `${scale}%`;
+  };
+  applyFontScale(Number(localStorage.getItem(FONT_SCALE_ITEM_ID)) || 100);
 
   const local = await DocumentStore.load("nta");
 
@@ -160,6 +166,22 @@ async function main() {
 
         alert("User key copied to clipboard.");
 
+        return true;
+      }
+
+      if (action.id === "fontScale") {
+        const current = Number(localStorage.getItem(FONT_SCALE_ITEM_ID)) || 100;
+        const answer = prompt("Font scale in percent (e.g. 75, 100, 125, 150)", String(current));
+        if (answer === null) {
+          return true;
+        }
+        const scale = Number(answer.trim().replace(/%$/, ""));
+        if (!Number.isFinite(scale) || scale < 25 || scale > 500) {
+          alert("ERROR: Invalid scale. Enter a number between 25 and 500.");
+          return true;
+        }
+        localStorage.setItem(FONT_SCALE_ITEM_ID, String(scale));
+        applyFontScale(scale);
         return true;
       }
 
